@@ -7,4 +7,7 @@ c = conn.cursor()
 
 
 c.execute('SELECT * FROM sensores ORDER BY date DESC')
-print c.fetchone()
+
+dado=c.fetchone();
+
+print dado
