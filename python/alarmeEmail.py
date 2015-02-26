@@ -7,4 +7,4 @@ c = conn.cursor()
 
 
 c.execute('SELECT * FROM sensores ORDER BY date DESC')
-print c.fetchall()
+print c.fetchone()
