@@ -1,5 +1,6 @@
-import sqlite3
-conn = sqlite3.connect('/opt/db/sensores.db')
+import sqlite3, sys
+
+conn = sqlite3.connect(sys.argv[1])
 
 c = conn.cursor()
 
