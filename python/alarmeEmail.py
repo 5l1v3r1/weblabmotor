@@ -1,13 +1,31 @@
 #!/usr/bin/python
 
 import sqlite3, sys
+from enviarEmail import send_mail
 
-conn = sqlite3.connect(sys.argv[1])
+bancoDados	=sys.argv[1];
+sensor 		=sys.argv[2];
+send_from	=sys.argv[3];
+send_to		=sys.argv[4];
+subject		=sys.argv[5];
+text		=sys.argv[6];
+files		=sys.argv[7];
+server		=sys.argv[8];
+port		=sys.argv[9];
+username	=sys.argv[10];
+password	=sys.argv[11];
+isTls		=sys.argv[12]; 
+
+
+conn = sqlite3.connect(bancoDados)
 c = conn.cursor()
-
 
 c.execute('SELECT * FROM sensores ORDER BY date DESC')
 
 dado=c.fetchone();
 
-print dado
+if dado[1] == 9:
+   print "Enviar email"
+   send_mail( send_from, send_to, subject, text, files, server, port, username, password, isTls)
+else:
+   print "Tudo OK"
