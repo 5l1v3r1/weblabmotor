@@ -24,8 +24,8 @@ c.execute('SELECT * FROM sensores ORDER BY date DESC')
 
 dado=c.fetchone();
 
-if dado[1] == 9:
+if int(dado[1]) >= int(sensor):
    print "Enviar email"
    send_mail( send_from, send_to, subject, text, files, server, port, username, password, isTls)
 else:
-   print "Tudo OK"
+   print "Sensor sem problemas"
