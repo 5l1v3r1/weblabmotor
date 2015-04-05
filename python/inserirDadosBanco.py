@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import sqlite3, sys
 
 a0=sys.argv[1];

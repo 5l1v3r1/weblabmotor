@@ -1,6 +1,10 @@
+#!/usr/bin/python
+
 import sqlite3, sys
 
-conn = sqlite3.connect(sys.argv[1])
+bancoDados=sys.argv[1];
+
+conn = sqlite3.connect(bancoDados)
 
 c = conn.cursor()
 
