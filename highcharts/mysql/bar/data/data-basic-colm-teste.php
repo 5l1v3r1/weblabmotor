@@ -1,9 +1,12 @@
 <?php
 
 #Basic Line
-require '../../conn/connection.php';
+require '../../conn/connection-teste.php';
 
-$result = mysql_query("SELECT id, year AS TAHUN, month AS BULAN, COUNT( * ) AS JUMLAH FROM activities WHERE year=2012 GROUP BY MONTH ORDER BY id");
+$result = mysql_query();
+
+#"SELECT id, year AS TAHUN, month AS BULAN, COUNT( * ) AS JUMLAH FROM exp WHERE year=2012 GROUP BY MONTH ORDER BY id"
+#"SELECT * FROM `cna` WHERE `data` >= NOW() - INTERVAL 20 MINUTE;"
 
 $bln = array();
 $bln['name'] = 'Bulan';
