@@ -44,7 +44,10 @@ $cakeDescription = "Highcharts Chart PHP with MySQL Example";
                         <tr>                          
                             <td><a href="pie/pie-chart-3d.php">Pie Chart 3D</a></td>
                             <td><a href="bar/basic-line.php">Basic Line</a></td>                          
-                        </tr>                       
+                        </tr> 
+			<tr>                          
+                            <td><a href="bar/basic-line-teste.php">Basic Line TESTE</a></td>                          
+                        </tr>                         
                     </tbody>
                 </table>
 

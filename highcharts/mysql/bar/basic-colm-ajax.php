@@ -93,7 +93,7 @@ $cakeDescription = "Highcharts Pie Chart";
         
     </head>
     <body>
-        <a class="link_header" href="/highcharts/">&lt;&lt; Back to index</a>
+        <a class="link_header" href="/mysql/">&lt;&lt; Back to index</a>
         <div class="menu_top" >
             <select id="dynamic_data">
                 <option value="">Pilih</option>
