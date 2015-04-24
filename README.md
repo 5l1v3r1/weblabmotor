@@ -7,3 +7,6 @@ O projeto tem como objetivo efetuar uma análise quantitativa de motores a combu
 As análises terão como base a extração de parâmetros físicos do motor através de sensores, assim como a emissão de gases, temperatura, rotação e parametros elétricos de tensão de alimentação do sistema.
 
 O sistema poderá ser utilizado para diversos estudos em disciplinas nos cursos de engenharia, como em sistemas de controle, eletrônica embarcada (desenvolvimento de ECU), estequiometria em química (queima do combustível), startup de motores (mecânica básica), termodinâmica em física (estudo de temperatura no motor), mecânica em mecânica dos sólidos (Análise de torque e rotação).Além disso, podemos realizar testes nos motores utilizados nas competições baja, produzidas pela SAE Brasil, e mundialmente conhecida, e acoplar sistema num veículo particular, e ainda realizar análise de motores elétricos.
+
+
+Site: http://brnstabile.github.io/weblabmotor
