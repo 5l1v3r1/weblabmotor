@@ -62,6 +62,7 @@ $cakeDescription = "Highcharts Pie Chart";
                 $.getJSON("data/data-basic-colm-teste.php", function(json) {
                     options.xAxis.categories = json[0]['data']; //xAxis: {categories: []}
                     options.series[0] = json[1];
+                    options.series[1] = json[2];
                     chart = new Highcharts.Chart(options);
                 });
             });
