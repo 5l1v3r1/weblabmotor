@@ -2,13 +2,13 @@
 
 import sqlite3, sys
 
-a0=sys.argv[1];
-a1=sys.argv[2];
-a2=sys.argv[3];
-a3=sys.argv[4];
-a4=sys.argv[5];
-a5=sys.argv[6];
-bancoDados=sys.argv[7];
+bancoDados=sys.argv[1];
+a0=sys.argv[2];
+a1=sys.argv[3];
+a2=sys.argv[4];
+a3=sys.argv[5];
+a4=sys.argv[6];
+a5=sys.argv[7];
 
 conn = sqlite3.connect(bancoDados)
 c = conn.cursor()                            
