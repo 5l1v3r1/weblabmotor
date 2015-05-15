@@ -10,6 +10,7 @@
  */
 $cakeDescription = "Highcharts Pie Chart";
 ?>
+
 <!DOCTYPE HTML>
 <html>
     <head>
@@ -23,6 +24,9 @@ $cakeDescription = "Highcharts Pie Chart";
                     chart: {
                         renderTo: 'container',
                         type: 'line'
+                        //events: {
+                        //    load: requestData
+                        //}
                     },
                     title: {
                         text: 'Highcharts Chart PHP with MySQL Example',
@@ -59,12 +63,12 @@ $cakeDescription = "Highcharts Pie Chart";
                     },
                     series: []
                 };
-                $.getJSON("data/data-basic-colm-teste.php", function(json) {
+                setInterval(function () {$.getJSON("data/data-basic-colm-teste.php", function(json) {
                     options.xAxis.categories = json[0]['data']; //xAxis: {categories: []}
                     options.series[0] = json[1];
                     options.series[1] = json[2];
                     chart = new Highcharts.Chart(options);
-                });
+                });}, 3000);
             });
         </script>
         <script src="http://code.highcharts.com/highcharts.js"></script>
