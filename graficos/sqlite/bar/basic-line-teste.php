@@ -19,14 +19,14 @@ $cakeDescription = "Highcharts Pie Chart";
         <link href="../webroot/css/cake.generic.css" type="text/css" rel="stylesheet">
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
         <script type="text/javascript">
+        
+        var chart;
+
             $(document).ready(function() {
                 var options = {
                     chart: {
                         renderTo: 'container',
                         type: 'line'
-                        //events: {
-                        //    load: requestData
-                        //}
                     },
                     title: {
                         text: 'Highcharts Chart PHP with MySQL Example',
@@ -63,12 +63,21 @@ $cakeDescription = "Highcharts Pie Chart";
                     },
                     series: []
                 };
-                setInterval(function () {$.getJSON("data/data-basic-colm-teste.php", function(json) {
+                var url =  "http://localhost/graficos/sqlite/bar/data/data-basic-colm-teste.php";
+                $.getJSON(url,  function(json) {
                     options.xAxis.categories = json[0]['data']; //xAxis: {categories: []}
                     options.series[0] = json[1];
                     options.series[1] = json[2];
+                    //alert(options.series[0].toSource());
+                    //alert(options.series[1].toSource());
                     chart = new Highcharts.Chart(options);
-                });}, 3000);
+
+                    setInterval(function () {
+                        //alert("asda");
+                        chart.series[0].addPoint(options.series[0], true, true);  
+                    }, 3000);
+
+                });
             });
         </script>
         <script src="http://code.highcharts.com/highcharts.js"></script>
