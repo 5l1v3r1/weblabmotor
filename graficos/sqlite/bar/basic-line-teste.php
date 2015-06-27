@@ -19,8 +19,8 @@ $cakeDescription = "Highcharts Pie Chart";
         <link href="../webroot/css/cake.generic.css" type="text/css" rel="stylesheet">
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
         <script src="http://code.highcharts.com/highcharts.js"></script>
-        <script src="http://code.highcharts.com/stock/highstock.js"></script>
         <script src="http://code.highcharts.com/modules/exporting.js"></script>
+        <script src="../libs/export-csv/export-csv.js"></script>
         <script type="text/javascript">
 
         
@@ -30,9 +30,9 @@ $cakeDescription = "Highcharts Pie Chart";
                 var options = {
                     chart: {
                         renderTo: 'container',
-                        type: 'line'
+                        type: 'line',
+                        zoomType: 'xy',
                     },
-                    
                     title: {
                         text: 'Gráfico de temperaturas',
                         x: -20 //center
@@ -44,21 +44,8 @@ $cakeDescription = "Highcharts Pie Chart";
                     exporting: {
                         enabled: true
                     },
-                    rangeSelector: {
-                        buttons: [{
-                            count: 1,
-                            type: 'minute',
-                            text: '1M'
-                        }, {
-                            count: 5,
-                            type: 'minute',
-                            text: '5M'
-                        }, {
-                            type: 'all',
-                            text: 'All'
-                        }],
-                        inputEnabled: true,
-                        selected: 1
+                    rangeSelector:{
+                        enabled: true
                     },
                     xAxis: {
                         categories: [],
@@ -106,10 +93,28 @@ $cakeDescription = "Highcharts Pie Chart";
                     });
                 });
 
+                $(".rangeBtn").click(function() {
+                    if (!chart) return;
+                    var extremes = chart.xAxis[0].getExtremes();
+                    var max = extremes.max;
+                    var min = max - parseInt($(this).text());
+                    chart.xAxis[0].setExtremes(min, max);
+                    chart.showResetZoom();
+                });
+
+                $('#getcsv').click(function () {
+                    alert(chart.getCSV());
+                });
+
             });
 
         </script>
         <button id="button">Atualizar dados...</button>
+        <button id="getcsv">CSV</button>
+        <div id="rangeSelector">
+        <button id="range10" class="rangeBtn">10</button><button id="range20" class="rangeBtn">20</button><button id="range50" class="rangeBtn">50</button>
+        </div>
+
     </head>
     <body>
         <a class="link_header" href="/mysql/">&lt;&lt; Back to index</a>
