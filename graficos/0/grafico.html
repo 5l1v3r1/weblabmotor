@@ -1,26 +1,13 @@
-<?php
-/**
- *
- *
- * @link          https://github.com/mzm-dev 
- * @demo          http://highcharts-mzm.rhcloud.com
- * @created       September 2014
- * @fb            https://www.facebook.com/zakimedia
- * @email         mohdzaki04@gmail.com
- */
-$cakeDescription = "Highcharts Pie Chart";
-?>
-
-<!DOCTYPE HTML>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <title><?php echo $cakeDescription ?></title>
-        <link href="../webroot/css/cake.generic.css" type="text/css" rel="stylesheet">
-        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-        <script src="http://code.highcharts.com/highcharts.js"></script>
-        <script src="http://code.highcharts.com/modules/exporting.js"></script>
-        <script src="../libs/export-csv/export-csv.js"></script>
+        
+        <script src="./highcharts/api/js/jquery-1.9.1.min.js"></script>
+        <script src="./highcharts/js/adapters/standalone-framework.js"></script>
+        <script src="./highcharts/js/modules/exporting.js"></script>
+        
+        <script src="./libs/export-csv/export-csv.js"></script>
+
         <script type="text/javascript">
 
         
@@ -50,7 +37,7 @@ $cakeDescription = "Highcharts Pie Chart";
                     xAxis: {
                         categories: [],
                         title: {
-                            text: 'Tempo'
+                            text: 'Data'
                         }
                     },
                     yAxis: {
@@ -74,7 +61,7 @@ $cakeDescription = "Highcharts Pie Chart";
                     },
                     series: []
                 };
-                var url =  "http://localhost/graficos/sqlite/bar/data/data-basic-colm-teste.php";
+                var url =  "./dados.php";
                 $.getJSON(url,  function(json) {
                     options.xAxis.categories = json[0]['data']; //xAxis: {categories: []}
                     options.series[0] = json[1];
@@ -84,7 +71,7 @@ $cakeDescription = "Highcharts Pie Chart";
 
                 // The button action
                 $('#button').click(function() {
-                    var url =  "http://localhost/graficos/sqlite/bar/data/data-basic-colm-teste.php";
+                    var url =  "./dados.php";
                     $.getJSON(url,  function(json) {
                         options.xAxis.categories = json[0]['data']; //xAxis: {categories: []}
                         options.series[0] = json[1];
@@ -117,7 +104,6 @@ $cakeDescription = "Highcharts Pie Chart";
 
     </head>
     <body>
-        <a class="link_header" href="/mysql/">&lt;&lt; Back to index</a>
         <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
     </body>
 </html>
