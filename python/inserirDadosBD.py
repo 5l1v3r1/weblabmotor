@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#python inserirDados.py ./database.db a0 a1 a2 a3 a4 a5 a6
 
 import sqlite3, sys
 

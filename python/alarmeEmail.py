@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#python alarmeEmail.py ./database.db a0 send_from, send_to, subject, text, files, server, port, username, password, isTls
 
 import sqlite3, sys
 from enviarEmail import send_mail

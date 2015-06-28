@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+#python criarDB.py ./sensores.db
+
 import sqlite3, sys
 
 bancoDados=sys.argv[1];

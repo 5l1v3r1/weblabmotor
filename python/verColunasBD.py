@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#python verColunas.py ../database.db
 
 import sqlite3, sys
 

@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#python enviarEmail.py send_from send_to subject text files server port username password isTls
 
 import smtplib, os, sys
 from email.mime.multipart import MIMEMultipart

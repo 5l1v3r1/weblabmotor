@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#python verTabelas.py ../database.db
 
 import sqlite3, sys
 

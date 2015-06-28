@@ -1,4 +1,5 @@
 #!/usr/bin/python
+#python lerBanco.py ./database.db
 
 import sqlite3, sys
 
