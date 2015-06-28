@@ -15,7 +15,7 @@
   try
   {
     //open the database
-    $db = new PDO('sqlite:../sensores.db');
+    $db = new PDO('sqlite:../database/temp.db');
 
     $result = $db->query('SELECT * FROM sensores');
 
