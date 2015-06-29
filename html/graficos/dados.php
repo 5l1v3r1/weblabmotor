@@ -15,7 +15,7 @@
   try
   {
     //open the database
-    $db = new PDO('sqlite:/tmp/temp.db');
+    $db = new PDO('sqlite:/tmp/weblabmotor/temp.db');
 
     $result = $db->query('SELECT * FROM sensores');
 
