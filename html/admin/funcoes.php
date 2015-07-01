@@ -9,7 +9,7 @@
     
 	if ($_POST['enviar'] & $_POST['ok']) {
 	  exec("python /opt/weblabmotor/python/inserirDados.py /tmp/weblabmotor/temp.db $a0 $a1 $a2 $a3 $a4 $a5");
-	}else if($_POST['reset']){
+	}else if($_POST['reset'] & $_POST['ok']){
 	  shell_exec("/opt/weblabmotor/sh/resetGeralBD.sh");
 	}
 ?>
