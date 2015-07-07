@@ -9,15 +9,20 @@
 
         <script type="text/javascript">
 
-        
-        var chart;
+            var chart;
 
             $(document).ready(function() {
-                var options = {
+
+                chart = new Highcharts.Chart({
                     chart: {
                         renderTo: 'container',
                         type: 'line',
-                        zoomType: 'xy',
+                        marginRight: 130,
+                        marginBottom: 25,
+                        zoomType: 'xy', 
+                        events: {
+                            load: requestData
+                        }
                     },
                     title: {
                         text: 'Gráfico de temperaturas',
@@ -30,88 +35,96 @@
                     exporting: {
                         enabled: true
                     },
-                    rangeSelector:{
-                        enabled: true
-                    },
                     xAxis: {
-                        categories: [],
                         title: {
                             text: 'Data'
-                        }
+                        },
+                        categories: []
                     },
                     yAxis: {
                         title: {
-                            text: 'Temperatura'
+                            text: '°C'
                         },
                         plotLines: [{
-                                value: 0,
-                                width: 1,
-                                color: '#808080'
-                            }]
-                    },
-                    tooltip: {
-                        valueSuffix: '°C'
+                            value: 0,
+                            width: 1,
+                            color: '#808080'
+                        }]
                     },
                     legend: {
                         layout: 'vertical',
                         align: 'right',
-                        verticalAlign: 'middle',
+                        verticalAlign: 'top',
+                        x: -10,
+                        y: 100,
                         borderWidth: 0
                     },
                     series: []
-                };
-                var url =  "./dados.php";
-                $.getJSON(url,  function(json) {
-                    options.xAxis.categories = json[0]['data']; //xAxis: {categories: []}
-                    options.series[0] = json[1];
-                    options.series[1] = json[2];
-                    chart = new Highcharts.Chart(options);
                 });
-
-                // The button action
-                $('#button').click(function() {
-                    var url =  "./dados.php";
-                    $.getJSON(url,  function(json) {
-                        options.xAxis.categories = json[0]['data']; //xAxis: {categories: []}
-                        options.series[0] = json[1];
-                        options.series[1] = json[2];
-                        chart = new Highcharts.Chart(options);
-                    });
-                });
-
-                $(".rangeBtn").click(function() {
-                    if (!chart) return;
-                    var extremes = chart.xAxis[0].getExtremes();
-                    var max = extremes.max;
-                    var min = max - parseInt($(this).text());
-                    chart.xAxis[0].setExtremes(min, max);
-                    chart.showResetZoom();
-                });
-
-                $('#getcsv').click(function () {
-                    alert(chart.getCSV());
-                });
-
             });
+
+            function requestData() {    
+              $.ajax({
+                  url: 'http://localhost/cgi-bin/lerDados.py?bd=/tmp/weblabmotor/temp.db',
+                  type: "GET",
+                  dataType: "json",
+                  success: function(data) {
+                     
+                     chart.xAxis[0].setCategories(data[0].DATA);
+
+                      chart.addSeries({
+                        name: "a0",
+                        data: data[1].A0,
+                      });
+
+                      chart.addSeries({
+                        name: "a1",
+                        data: data[2].A1,
+                      });
+
+                  },
+                  cache: false
+              });
+            }
+
+            $('#atualizar').click(function() {
+                requestData();
+            });
+
+            $(".rangeBtn").click(function() {
+                if (!chart) return;
+                var extremes = chart.xAxis[0].getExtremes();
+                var max = extremes.max;
+                var min = max - parseInt($(this).text());
+                chart.xAxis[0].setExtremes(min, max);
+                chart.showResetZoom();
+            });
+
+
+            $('#getcsv').click(function () {
+                alert(chart.getCSV());
+            });
+
 
         </script>
 
     </head>
     <body>
-        <button id="button">Atualizar dados...</button>
+        <button id="atualizar">Atualizar dados...</button>
         <button id="getcsv">CSV</button>
         <div id="rangeSelector">
         <button id="range10" class="rangeBtn">10</button>
         <button id="range20" class="rangeBtn">20</button>
         <button id="range50" class="rangeBtn">50</button>
         </div>
-        
+
         <iframe name="nada" style="display:none;"></iframe>
         <form action="funcoes.php" method="post" target="nada">
         <button type="submit" name="transfer" value="true">Gravar</button>
         <button type="submit" name="reset" value="true">Reset</button>
         </form>
 
-
-        <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>    </body>
+        <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto">
+        </div>    
+    </body>
 </html>
