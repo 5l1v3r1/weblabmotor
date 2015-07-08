@@ -1,0 +1,35 @@
+<html>
+
+<body>
+
+<iframe name="mensagem" style="display:none;"></iframe>
+
+<form action="funcoes.php" method="post" target="mensagem">
+Apagar banco de dados geral.
+<input type="checkbox" name="ok" value="true"/><br>
+<button type="submit" name="reset" value="true">Reset</button>
+</form>
+
+<h4>Simular dados</h4>
+
+<form action="funcoes.php" method="post" target="mensagem">
+A0:   <input type="number" name="a0" min="0" max="1023"/><br>
+A1:   <input type="number" name="a1" min="0" max="1023"/><br>
+A2:   <input type="number" name="a2" min="0" max="1023"/><br>
+A3:   <input type="number" name="a3" min="0" max="1023"/><br>
+A4:   <input type="number" name="a4" min="0" max="1023"/><br>
+A5:   <input type="number" name="a5" min="0" max="1023"/><br>
+Habilitar <input type="checkbox" name="ok" value="true"/><br>
+     <input type="reset"/><br>
+     <input type="submit" name="enviar" value="Enviar" /><br>
+</form>
+<hr>
+
+ <h1>Graficos</h1>
+ <h3>Ultima coleta</h3>
+ <iframe src="../graficos/index.html" height="300" width="500"></iframe> 
+ <h3>Todos dados</h3>
+ <iframe src="./dados.html" height="300" width="500"></iframe> 
+
+</body>
+</html>
