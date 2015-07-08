@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-import cgi, cgitb, sqlite3, sys, json 
+import cgi, cgitb, sqlite3, sys
 
 dados = cgi.FieldStorage() 
 
@@ -21,6 +21,6 @@ conn.commit()
 conn.close()
 
 print "Status: 200 OK"
-print "Content-Type: application/json"
+print "Content-Type: text/html"
 print ""
-print "%s"%(dados)
+print "%s" %(dados)
