@@ -85,18 +85,39 @@
               });
             }
 
-            $('#atualizar').click(function() {
-                requestData();
-            });
+            function updateData() {    
+              $.ajax({
+                  url: '/cgi-bin/python/database-reader.py?bd=/tmp/weblabmotor/temp.db',
+                  type: "GET",
+                  dataType: "json",
+                  success: function(data) {
+                     
+                     chart.xAxis[0].setCategories(data[0].DATA);
+
+                      chart.series[0].update({
+                        pointStart: data[1].pointStart,
+			    		data: data[1].A0
+                      }, true);
+
+                      chart.series[1].update({
+                        pointStart: data[2].pointStart,
+			    		data: data[2].A1
+                      }, true);
+
+                  },
+                  cache: false
+              });
+            }
+            
 
         </script>
 
     </head>
     <body>
-        <button id="atualizar">Atualizar dados...</button>
+        <input type="button" value="Atualizar" onclick="updateData()">
 
         <iframe name="nada" style="display:none;"></iframe>
-        <form action="funcoes.php" method="post" target="nada">
+        <form action="/cgi-bin/python/database-transfer.py?bdOrigem=/tmp/weblabmotor/temp.db&bdAlvo=/var/lib/weblabmotor/sensores.db" method="get" target="nada">
         <button type="submit" name="transfer" value="true">Gravar</button>
         <button type="submit" name="reset" value="true">Reset</button>
         </form>

@@ -85,15 +85,37 @@
               });
             }
 
-            $('#atualizar').click(function() {
-                chart.redraw();
-            });
+            
+            function updateData() {    
+              $.ajax({
+                  url: '/cgi-bin/python/database-reader.py?bd=/var/lib/weblabmotor/sensores.db',
+                  type: "GET",
+                  dataType: "json",
+                  success: function(data) {
+                     
+                     chart.xAxis[0].setCategories(data[0].DATA);
+
+                      chart.series[0].update({
+                        pointStart: data[1].pointStart,
+                        data: data[1].A0
+                      }, true);
+
+                      chart.series[1].update({
+                        pointStart: data[2].pointStart,
+                        data: data[2].A1
+                      }, true);
+
+                  },
+                  cache: false
+              });
+            }
+        
 
         </script>
 
     </head>
     <body>
-        <button id="atualizar">Atualizar dados...</button>
+        <input type="button" value="Atualizar" onclick="updateData()">
 
         <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto">
         </div>    
