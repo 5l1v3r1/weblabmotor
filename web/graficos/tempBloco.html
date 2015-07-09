@@ -117,9 +117,12 @@
         <input type="button" value="Atualizar" onclick="updateData()">
 
         <iframe name="nada" style="display:none;"></iframe>
-        <form action="/cgi-bin/python/database-transfer.py?bdOrigem=/tmp/weblabmotor/temp.db&bdAlvo=/var/lib/weblabmotor/sensores.db" method="get" target="nada">
-        <button type="submit" name="transfer" value="true">Gravar</button>
-        <button type="submit" name="reset" value="true">Reset</button>
+        <form action="/cgi-bin/python/database-transfer.py?bdOrigem=/tmp/weblabmotor/temp.db&bdAlvo=/var/lib/weblabmotor/sensores.db" method="post" target="nada">
+		<input type="submit" value="Gravar" /><br>
+        </form>
+
+        <form action="/cgi-bin/python/database-reset.py?bd=/tmp/weblabmotor/temp.db" method="post" target="nada">
+		<input type="submit" value="Apagar" /><br>
         </form>
 
         <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto">
