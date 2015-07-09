@@ -10,6 +10,19 @@ Apagar banco de dados geral.
 <button type="submit" name="reset" value="true">Reset</button>
 </form>
 
+<h4>Criar banco de dados</h4>
+
+<form action="/cgi-bin/python/database-create.py" method="post" target="mensagem">
+<input type="radio" name="bd" value="/tmp/weblabmotor/temp.db" checked> Temp
+<br>
+<input type="radio" name="bd" value="/var/lib/weblabmotor/sensores.db"> Geral
+<br>
+<input type="reset"/>
+<br>
+<input type="submit" value="Submit" /><br>
+</form>
+
+
 <h4>Simular dados</h4>
 
 <form action="/cgi-bin/python/database-insert.py" method="post" target="mensagem">

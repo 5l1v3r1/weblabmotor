@@ -3,9 +3,16 @@ mkdir /tmp/weblabmotor/
 mkdir /var/lib/weblabmotor/
 chown -R www-data.www-data /var/lib/weblabmotor/
 chown -R www-data.www-data /tmp/weblabmotor/
-python /opt/weblabmotor/python/criarBD.py /tmp/weblabmotor/temp.db
-python /opt/weblabmotor/python/criarBD.py /var/lib/weblabmotor/sensores.db
 chmod -R 777 /tmp/weblabmotor/
 chmod -R 777 /var/lib/weblabmotor/
-ln -s -T /opt/weblabmotor/html/ /var/www/weblabmotor
-apt-get install mysql-server mysql-common mysql-client php5-mysql php5-cgi php5-sqlite libapache2-mod-php5 sqlite3
+
+chown -R www-data.www-data /var/www/graficos
+chown -R www-data.www-data /var/www/cgi-bin
+chown -R www-data.www-data /var/www/admin
+chown -R 755 /var/www/graficos
+chown -R 755 /var/www/cgi-bin
+chown -R 755 /var/www/admin
+
+ln -s -T /opt/weblabmotor/web/graficos /var/www/graficos
+ln -s -T /opt/weblabmotor/web/cgi-bin /var/www/cgi-bin
+ln -s -T /opt/weblabmotor/web/admin /var/www/admin
