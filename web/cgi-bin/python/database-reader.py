@@ -20,7 +20,7 @@ connection.row_factory = dict_factory
  
 cursor = connection.cursor()
 
-cursor.execute("SELECT * FROM sensores ORDER BY date DESC")
+cursor.execute("SELECT * FROM sensores ORDER BY date ASC")
  
 dados = cursor.fetchall()
 
