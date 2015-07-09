@@ -9,4 +9,3 @@ chmod -R 777 /tmp/weblabmotor/
 chmod -R 777 /var/lib/weblabmotor/
 ln -s -T /opt/weblabmotor/html/ /var/www/weblabmotor
 apt-get install mysql-server mysql-common mysql-client php5-mysql php5-cgi php5-sqlite libapache2-mod-php5 sqlite3
-service apache2 restart
