@@ -1,13 +1,14 @@
 var http = require('http');
 
-var sqlite3 = require('sqlite3').verbose();
+//var sqlite3 = require('sqlite3').verbose();
  
-var db = new sqlite3.Database('mydb.db');
+//var db = new sqlite3.Database('mydb.db');
  
 var check;
  
-var dados;
+//var dados;
 
+/*
 db.serialize(function() {
   
  
@@ -29,17 +30,16 @@ db.serialize(function() {
 });
 
 db.close();
+*/
 
-var server = http.createServer(function(req, res) {
+var arr = [ 'a', 'b', 'c'];
+var aaa = JSON.stringify(arr);
 
-  res.writeHead(200);
+var server = http.createServer(function(request, response) {
 
-  res.end('Hello Http');
-  res.end('Hello Http');
-  res.end('Hello Http');
-
-  res.end(dados);
- 
+  response.writeHead(200, { 'Content-Type': 'application/json'});
+  response.end(aaa);
+  
 });
  
 server.listen(8080);
