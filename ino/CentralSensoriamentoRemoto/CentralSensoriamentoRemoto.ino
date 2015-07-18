@@ -1,3 +1,32 @@
+/*
+
+                     Arduino Pin Mapping:
+   ----------------------------------------------------------
+                 Use  Pin       Pin     Use
+                      Power     SCL     MPU-6050 SCL
+                 3.3V IOREF     SDS     MPU-6050 SDA
+                      Reset     AREF
+        Device power  3.3V      GND
+                      5V        D13     Motor DirA
+                      GND       D12     Motor DirB
+                      GND       D11~    Motor PWMB
+        Cut on motor  Vin       D10~
+                                D9~     Motor BrakeA
+          Motor CurA  A0        D8      Motor BrakeB
+          Motor CurB  A1
+     Battery Voltage  A2        D7      LED Heart Beat
+                      A3        D6~     LED Upright
+                      A4        D5~     
+                      A5        D4
+                                D3~     Motor PWMA
+                                D2
+                                D1 Tx   BT Rx
+                                D0 Rx   BT Tx w/ 10K pull-up
+   ----------------------------------------------------------
+   
+*/
+
+
 #include <SPI.h>
 #include <Ethernet.h>
 
