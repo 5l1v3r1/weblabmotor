@@ -1,8 +1,11 @@
-int alimentacao;
 int tensaoVoltimetro;
-int erro;
+int tensaoCC;
+int tensaoCA;
+
+int coeficienteVoltimetro = 44;
 
 int voltimetro = 0;
+int gap = 200;
 
 void setup() {
   Serial.begin(9600);
@@ -15,17 +18,15 @@ void setup() {
 
 void loop() {
 
-  tensaoVoltimetro = analogRead(voltimetro);  
-  erro = map(tensaoVoltimetro,0,1023,-1,1);
-  
-  if( erro < 0){
-    sentidoHorario(200);
-  }else if(erro > 0){
-     sentidoAntiHorario(200);
-  }else{
-    desligarControleCarburador();
+  tensaoCC = (5 * analogRead(voltimetro))/1023;
+  tensaoCA = tensaoCC * coeficienteVoltimetro;
+
+  if(tensaoCA >= 120){
+     sentidoHorario(gap);
+  }else if(tensaoCA <= 100){
+     sentidoAntiHorario(gap);    
   }
-  
+
 }
 
 void sentidoHorario(int tempo){
@@ -88,11 +89,4 @@ void sentidoAntiHorario(int tempo){
   digitalWrite(9, HIGH); 
   
   delay(tempo);  
-}
-
-void desligarControleCarburador(){
-  digitalWrite(12, LOW);  
-  digitalWrite(11, LOW);
-  digitalWrite(10, LOW);
-  digitalWrite(9, LOW);  
 }
