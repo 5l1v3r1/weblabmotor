@@ -44,7 +44,7 @@ char command = 0;
 //Flags
 //Comando recebido com sucesso
 boolean runCommand = false;
-boolean runReadSensors = false;
+boolean flagReadSensors = false;
 
 //Gets a client that is connected to the server and has data available for reading
 EthernetClient client;
@@ -72,7 +72,7 @@ void loop() {
   
   comandos();
   
-  if(runReadSensors){
+  if(flagReadSensors){
     comandos();
     readSensors(client);    
   }
@@ -100,26 +100,18 @@ void comandos(){
     
     case '1':
     controlarMotor();
-    //client.flush(); //Exclusao de qualquer dado remanescente dos clients
-    //client.stop(); // Fechar qualquer conexao
     break;
     
     case '2':
-    runReadSensors = true;
-    //client.flush(); //Exclusao de qualquer dado remanescente dos clients
-    //client.stop(); // Fechar qualquer conexao 
+    flagReadSensors = true;
     break;
     
     case '3':
-    runReadSensors = false;
-    //client.flush(); //Exclusao de qualquer dado remanescente dos clients
-    //client.stop(); // Fechar qualquer conexao 
+    flagReadSensors = false;
     break;
     
     case '9':
     resetExperimento();
-    //client.flush(); //Exclusao de qualquer dado remanescente dos clients
-    //client.stop(); // Fechar qualquer conexao
     break;
     
     default:
@@ -198,7 +190,7 @@ void temperaturaBloco(EthernetClient client){
   float temperaturaCalotaBranca=(5*calotaBrancaAnalog*100)/1023;
   
   Serial.println(temperaturaCalotaBranca);
-  delay(500);
+
 }
 
 void controlarMotor(){
