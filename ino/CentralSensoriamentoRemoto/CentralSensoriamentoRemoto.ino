@@ -227,7 +227,7 @@ void resetExperimento(){
 
   Serial.println("Reiniciando experimento...");
   conectarRede();
-  digitalWrite(motor,LOW);
+  pinSetup();
   
 }
 
