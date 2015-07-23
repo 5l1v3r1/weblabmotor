@@ -100,13 +100,11 @@ void loop() {
 
   client = server.available();
   
-  // Verificar clients e receber comandos via ethernet.
   verificarComandos(client);
   
-  comandos();
+  executarComandoRecebido();
   
   if(flagReadSensors){
-    comandos();
     readSensors(client);    
   }
 }
@@ -176,7 +174,7 @@ void setupMovimento() {
 //.....................................SETUP...........................................
 
 //..................................................
-void comandos(){
+void executarComandoRecebido(){
   
   if(runCommand){
   
@@ -190,6 +188,7 @@ void comandos(){
     
     case '1':
     controlarMotor();
+    client.stop();
     break;
     
     case '2':
@@ -198,15 +197,16 @@ void comandos(){
     
     case '3':
     flagReadSensors = false;
+    client.stop();
     break;
     
     case '9':
     resetExperimento();
+    client.stop();
     break;
     
     default:
     Serial.println("Comando nao cadastrado");
-    client.flush(); //Exclusao de qualquer dado remanescente dos clients
     client.stop(); // Fechar qualquer conexao
     break;
     
@@ -227,7 +227,7 @@ void verificarComandos(EthernetClient client){
   Serial.println("Cliente Conectado");
   
   //Verifica se existem dados remanescentes do cliente, conectado ou nao
-  if(client.connected()) {
+  if(client.available()) {
   
     c = client.read();//Faz a leitura de um caracter
     client.flush();
@@ -280,6 +280,7 @@ void temperaturaBloco(EthernetClient client){
   float temperaturaCalotaBranca=(5*calotaBrancaAnalog*100)/1023;
   
   Serial.println(temperaturaCalotaBranca);
+  client.println(temperaturaCalotaBranca);
 
 }
 
