@@ -15,8 +15,7 @@ public class ArduinoEthernetComm
 	
 	public void CommEthArduino(String serverIP, int serverPort, String msgToServer) throws Exception
 	 {
-		  ConexaoMysql cm = new ConexaoMysql();
-		
+		  
 		  String msgFromServer="Nada recebido do experimento";//received message will be stored here  
 
 		  Socket clientSocket = new Socket(serverIP, serverPort);//making the socket connection
@@ -28,20 +27,18 @@ public class ArduinoEthernetComm
 		  //BufferedReader from Arduino-Server
 		  BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));//
 
-		  //outToServer.writeBytes(msgToServer+'\n');//sending the message
-		  outToServer.writeBytes(msgToServer);//sending the message
+		  outToServer.writeBytes(msgToServer+'\n');//sending the message
+		  //outToServer.writeBytes(msgToServer);//sending the message
 		  
 		  System.out.println("sending to Arduino-Server: "+msgToServer);//debug
 		  		  	      
-	      while((msgFromServer = inFromServer.readLine()) != null){
+	      if((msgFromServer = inFromServer.readLine()) != null){
 		      System.out.println("received from Arduino-Server: " + msgFromServer);//print the answer
-		      cm.EnviarDadosDB(msgFromServer);
 	      }
 	      
 		  clientSocket.close();
 		  System.out.println("Disconnected from:"+serverIP);//debug
 		  
 	 }
-
 
 }

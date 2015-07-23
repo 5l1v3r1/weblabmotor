@@ -22,23 +22,18 @@ public class DummyExperimentServer extends ExperimentServer {
 		return "ok";
 	}
 	
-	public String sendCommand(String command)  throws WebLabException {
+	public String sendCommand(String command) {
 					
-		    String dados = "Recebendo dados do experimento...";
-			ArduinoEthernetComm aec = new ArduinoEthernetComm();
+	    String dados = "Comunicando com o experimento...";
+		ArduinoEthernetComm aec = new ArduinoEthernetComm();
 
 			try {
-				//Colocar estes dados retornados no documento csv ou retornar ao usuário para exibir o gráfico
-				aec.CommEthArduino("192.168.42.4", 80, command);
-				aec.CommEthArduino("192.168.42.5", 80, "d");
-				
+				aec.CommEthArduino("192.168.0.104", 10000, command);		
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			
-			
 			}
-			return dados;
+		return dados;
 	}
 	
 	public void dispose() {
