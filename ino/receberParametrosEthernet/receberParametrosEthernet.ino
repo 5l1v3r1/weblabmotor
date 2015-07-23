@@ -14,7 +14,7 @@ int i;
 
 //Flags
 boolean runCommand = false;
-boolean runReadSensors = false;
+boolean runPID = false;
 
 void setup() {
   // put your setup code here, to run once:
@@ -35,8 +35,8 @@ void loop() {
     verificarComandos(client);
   }
   
-  if(runReadSensors){
-    readSensors();
+  if(runPID){
+    enablePID();
   }
 
   if (runCommand && command) {
@@ -49,20 +49,21 @@ void loop() {
 
     if (command == "quit") {
       client.stop();
+      setup();
       command = "";
     } else if ( command.substring(0, x) == "pwm") {
       Serial.print("Dados pwm: ");
       Serial.println(command.substring(x + 1, t));
       client.stop();
       command = "";
-    } else if (command.substring(0, x) == "dados") {
-       Serial.println("controlar fluxo de dados ");
+    } else if (command.substring(0, x) == "pid") {
+       Serial.println("controlando ativando pid ");
       if( command.substring(x + 1, t) == "on"){
-        Serial.println("fluxo de dados ligado");
-        runReadSensors=true;
+        Serial.println("ativando pid");
+        runPID=true;
       }else if(command.substring(x + 1, t) == "off"){
-        Serial.println("fluxo de dados desligado");
-        runReadSensors=false;
+        Serial.println("desativando pid");
+        runPID=false;
       }
     }
       client.stop();
@@ -115,13 +116,13 @@ void verificarComandos(EthernetClient client) {
         Serial.print(command);
         Serial.println("]");
         runCommand = true;
+        client.stop();
       }
 
     }
   }
 }
 
-void readSensors() {
-  Serial.println("enviando dados...");
-  client.println("dados");
+void enablePID() {
+  Serial.println("PID control...");
 }

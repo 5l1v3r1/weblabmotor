@@ -193,6 +193,7 @@ void executarComandoRecebido(){
     
     case '2':
     flagReadSensors = true;
+    client.stop();
     break;
     
     case '3':
@@ -280,8 +281,6 @@ void temperaturaBloco(EthernetClient client){
   float temperaturaCalotaBranca=(5*calotaBrancaAnalog*100)/1023;
   
   Serial.println(temperaturaCalotaBranca);
-  client.println(temperaturaCalotaBranca);
-
 }
 
 void controlarMotor(){
