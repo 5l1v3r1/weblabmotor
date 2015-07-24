@@ -50,6 +50,15 @@ int statusMotor;
 boolean runCommand = false;
 boolean flagReadSensors = false;
 
+//temperatura placa
+char scale[4];
+char raw[4];
+char offset[4];
+
+int raw_i;
+int scale_i;
+int offset_i;
+
 //Barometro
 float temperature;
 float pressure;
@@ -105,7 +114,7 @@ void loop() {
   executarComandoRecebido();
   
   if(flagReadSensors){
-    readSensors(client);    
+    readSensors();    
   }
 }
 //....................................MAIN...................................
@@ -126,6 +135,7 @@ void setupRede(){
     Ethernet.begin(mac);
     delay(1000);
   }
+  
   delay(200);
   system("/etc/init.d/networking restart");
   delay(200);
@@ -216,8 +226,13 @@ void executarComandoRecebido(){
   }
 }
 
-void readSensors(EthernetClient client){
-  temperaturaBloco(client);
+void readSensors(){
+  Serial.println(temperaturaBloco());
+  //String t = temperaturaCSR();
+  char dateCmd[]="python /opt/weblabmotor/python/database-insert.py /tmp/weblabmotor/temp.db 1 2 3 4 5 6 7";  
+  //dateCmd+="2";  
+  system(dateCmd);  
+  //system("python /opt/weblabmotor/python/database-insert.py /tmp/weblabmotor/temp.db 1 2 3 4 5 6 7");
 }
 
 void verificarComandos(EthernetClient client){
@@ -225,7 +240,7 @@ void verificarComandos(EthernetClient client){
   //Verifica se existe um cliente conectado
   if (client) {
   
-  Serial.println("Cliente Conectado");
+  //Serial.println("Cliente Conectado");
   
   //Verifica se existem dados remanescentes do cliente, conectado ou nao
   if(client.available()) {
@@ -265,7 +280,7 @@ void verificarComandos(EthernetClient client){
 
 }
 
-void temperaturaBloco(EthernetClient client){
+int temperaturaBloco(){
   
   int i;
   int calotaBrancaAnalog = A0;
@@ -280,7 +295,7 @@ void temperaturaBloco(EthernetClient client){
   
   float temperaturaCalotaBranca=(5*calotaBrancaAnalog*100)/1023;
   
-  Serial.println(temperaturaCalotaBranca);
+  return(temperaturaCalotaBranca);
 }
 
 void controlarMotor(){
@@ -361,6 +376,34 @@ void movimento() {
         Serial.write((uint8_t)(gy >> 8)); Serial.write((uint8_t)(gy & 0xFF));
         Serial.write((uint8_t)(gz >> 8)); Serial.write((uint8_t)(gz & 0xFF));
     #endif
+}
+
+
+int temperaturaCSR(){
+
+  FILE *fp_raw;
+  fp_raw = fopen("/sys/bus/iio/devices/iio:device0/in_temp0_raw", "r");     //read the values from scale, raw and offset files.
+  fgets(raw, 4, fp_raw);                                                    //we need all three values, because the formula for
+  fclose(fp_raw);                                                           //calulating the actual temperature in milli-degrees Celcius
+                                                                            //is: TEMP = (RAW + OFFSET) * SCALE
+  FILE *fp_scale;
+  fp_scale = fopen("/sys/bus/iio/devices/iio:device0/in_temp0_scale", "r");
+  fgets(scale, 4, fp_scale);
+  fclose(fp_scale);
+ 
+  FILE *fp_offset;
+  fp_offset = fopen("/sys/bus/iio/devices/iio:device0/in_temp0_offset", "r");
+  fgets(offset, 4, fp_offset);
+  fclose(fp_offset);
+  
+  raw_i = atoi(raw);         //we have the values now, but they are in ASCII form-                                                      
+  scale_i = atoi(scale);     //we need them as integers so we can use them for calculations.
+  offset_i = atoi(offset);
+ 
+  int temp = (raw_i + offset_i) * scale_i;  //Calculate temperature in milli-degrees celcius
+  temp /= 1000;                         //divide by 1000 to convert to degrees celcius
+  return temp; 
+ 
 }
 
 
