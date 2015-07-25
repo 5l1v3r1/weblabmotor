@@ -227,12 +227,16 @@ void executarComandoRecebido(){
 }
 
 void readSensors(){
-  Serial.println(temperaturaBloco());
-  //String t = temperaturaCSR();
-  char dateCmd[]="python /opt/weblabmotor/python/database-insert.py /tmp/weblabmotor/temp.db 1 2 3 4 5 6 7";  
-  //dateCmd+="2";  
-  system(dateCmd);  
-  //system("python /opt/weblabmotor/python/database-insert.py /tmp/weblabmotor/temp.db 1 2 3 4 5 6 7");
+
+  char bffr [1000];
+  int tcsr = temperaturaCSR();
+  int tblc = temperaturaBloco();
+  
+  sprintf (bffr,"python /opt/weblabmotor/python/database-insert.py /tmp/weblabmotor/temp.db %d 1 2 3 4 4 2 3", tcsr,tblc);
+  Serial.println(bffr); 
+  
+  system(bffr);  
+
 }
 
 void verificarComandos(EthernetClient client){
