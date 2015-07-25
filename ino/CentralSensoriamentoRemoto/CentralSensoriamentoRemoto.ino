@@ -1,28 +1,40 @@
 /*
 
-                     Arduino Pin Mapping:
-   ----------------------------------------------------------
-                 Use  Pin       Pin     Use
-                      Power     SCL     MPU-6050 SCL
-                 3.3V IOREF     SDS     MPU-6050 SDA
-                      Reset     AREF
-        Device power  3.3V      GND
-                      5V        D13     Motor DirA
-                      GND       D12     Motor DirB
-                      GND       D11~    Motor PWMB
-        Cut on motor  Vin       D10~
-                                D9~     Motor BrakeA
-          Motor CurA  A0        D8      Motor BrakeB
-          Motor CurB  A1
-     Battery Voltage  A2        D7      LED Heart Beat
-                      A3        D6~     LED Upright
-                      A4        D5~     
-                      A5        D4
-                                D3~     Motor PWMA
-                                D2
-                                D1 Tx   BT Rx
-                                D0 Rx   BT Tx w/ 10K pull-up
-   ----------------------------------------------------------
+Barometro: GY-65
+SDA <-> SDA
+SCL <-> SCL
+VCC <-> 3.3V
+
+LCD: LCD
+
+
+Termopar: TPA
+
+--------------------------------
+SCL GY-65
+SDA GY-65
+
+D13
+D12
+D11~
+D10~
+D9~
+D8
+D7
+D6~
+D5~
+D4
+D3~
+D2
+D1
+D0
+
+A0
+A1
+A2
+A3
+A4
+A5
    
 */
 #include "I2Cdev.h"
@@ -31,6 +43,18 @@
 #include "Wire.h"
 #include "SPI.h"
 #include "Ethernet.h"
+
+struct dadosCSR {       
+    char msg[50];       //50 bytes      
+    int tempCSR;   //2 bytes
+    int tempTPA;
+    int tempBAR;   //2 bytes
+    int presBAR;   //2 bytes 
+    int altBAR;   //2 bytes   
+}; 
+
+//variável global que contém todos os elementos da estrutura
+  struct dadosCSR dadosSensores;  //tal variável possui tamanho de 116 bytes
 
 //Endereco MAC para o shield Ethernet
 byte mac[] = { 0x98, 0x4F, 0xEE, 0x00, 0x25, 0x6F };
@@ -101,6 +125,9 @@ void setup() {
 
   setupPin();
   setupRede();
+  setupI2C();
+  setupBarometro();
+  
 
 }
 
@@ -168,7 +195,6 @@ void setupBarometro() {
     barometer.initialize();
 
     // verify connection
-    Serial.println("Testing device connections...");
     Serial.println(barometer.testConnection() ? "BMP085 connection successful" : "BMP085 connection failed");
 
 }
@@ -178,7 +204,6 @@ void setupMovimento() {
     accelgyro.initialize();
 
     // verify connection
-    Serial.println("Testing device connections...");
     Serial.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
 }
 //.....................................SETUP...........................................
@@ -228,15 +253,21 @@ void executarComandoRecebido(){
 
 void readSensors(){
 
-  char bffr [1000];
-  int tcsr = temperaturaCSR();
-  int tblc = temperaturaBloco();
+  temperaturaCSR();
+  temperaturaTermopar();
+  barometro();
   
-  sprintf (bffr,"python /opt/weblabmotor/python/database-insert.py /tmp/weblabmotor/temp.db %d 1 2 3 4 4 2 3", tcsr,tblc);
-  Serial.println(bffr); 
+  char bffr [10000];
   
-  system(bffr);  
+  sprintf (bffr,"python /opt/weblabmotor/python/database-insert.py /tmp/weblabmotor/temp.db %d %d %d %d 4 4 2 3", dadosSensores.tempTPA, dadosSensores.tempBAR,dadosSensores.presBAR,dadosSensores.altBAR); 
+  //system(bffr);
+  
+  dadosSensores.tempTPA = 0;
+  dadosSensores.tempBAR = 0;
+  dadosSensores.presBAR = 0;
+  dadosSensores.altBAR = 0;  
 
+  Serial.println(bffr); 
 }
 
 void verificarComandos(EthernetClient client){
@@ -284,7 +315,7 @@ void verificarComandos(EthernetClient client){
 
 }
 
-int temperaturaBloco(){
+void temperaturaTermopar(){
   
   int i;
   int calotaBrancaAnalog = A0;
@@ -299,7 +330,7 @@ int temperaturaBloco(){
   
   float temperaturaCalotaBranca=(5*calotaBrancaAnalog*100)/1023;
   
-  return(temperaturaCalotaBranca);
+  dadosSensores.tempTPA = temperaturaCalotaBranca;
 }
 
 void controlarMotor(){
@@ -346,11 +377,15 @@ void barometro() {
     altitude = barometer.getAltitude(pressure);
 
     // display measured values if appropriate
-    Serial.print("T/P/A\t");
-    Serial.print(temperature); Serial.print("\t");
-    Serial.print(pressure); Serial.print("\t");
-    Serial.print(altitude);
-    Serial.println("");
+    //Serial.print("T/P/A\t");
+    //Serial.print(temperature); Serial.print("\t");
+    //Serial.print(pressure); Serial.print("\t");
+    //Serial.print(altitude);
+    //Serial.println("");
+    
+    dadosSensores.tempBAR = temperature;
+    dadosSensores.presBAR = pressure;
+    dadosSensores.altBAR = altitude;
 }
 
 void movimento() {
@@ -383,8 +418,8 @@ void movimento() {
 }
 
 
-int temperaturaCSR(){
-
+void temperaturaCSR(){
+  
   FILE *fp_raw;
   fp_raw = fopen("/sys/bus/iio/devices/iio:device0/in_temp0_raw", "r");     //read the values from scale, raw and offset files.
   fgets(raw, 4, fp_raw);                                                    //we need all three values, because the formula for
@@ -406,7 +441,8 @@ int temperaturaCSR(){
  
   int temp = (raw_i + offset_i) * scale_i;  //Calculate temperature in milli-degrees celcius
   temp /= 1000;                         //divide by 1000 to convert to degrees celcius
-  return temp; 
+
+  dadosSensores.tempCSR = temp;
  
 }
 
