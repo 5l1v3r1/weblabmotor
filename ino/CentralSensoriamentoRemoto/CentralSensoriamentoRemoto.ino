@@ -24,7 +24,7 @@ D12 TPA
 D11~
 D10~
 D9~
-D8
+D8 TPA
 D7
 D6~
 D5~
