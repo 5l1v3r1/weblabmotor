@@ -9,13 +9,18 @@ LCD: LCD
 
 
 Termopar: TPA
-
+GND <-> GND
+GND <-> GND
+D8 <-> D8
+SDO <-> 12
+SCK <-> 13
+5V <-> 5V
 --------------------------------
 SCL GY-65
 SDA GY-65
 
-D13
-D12
+D13 TPA
+D12 TPA
 D11~
 D10~
 D9~
@@ -43,11 +48,14 @@ A5
 #include "Wire.h"
 #include "SPI.h"
 #include "Ethernet.h"
+#include "Nanoshield_Thermocouple.h"
+
 
 struct dadosCSR {       
     char msg[50];       //50 bytes      
     int tempCSR;   //2 bytes
-    int tempTPA;
+    int tempTPAint;
+    int tempTPAext;
     int tempBAR;   //2 bytes
     int presBAR;   //2 bytes 
     int altBAR;   //2 bytes   
@@ -55,6 +63,8 @@ struct dadosCSR {
 
 //variável global que contém todos os elementos da estrutura
   struct dadosCSR dadosSensores;  //tal variável possui tamanho de 116 bytes
+
+Nanoshield_Thermocouple thermocouple;
 
 //Endereco MAC para o shield Ethernet
 byte mac[] = { 0x98, 0x4F, 0xEE, 0x00, 0x25, 0x6F };
@@ -127,6 +137,7 @@ void setup() {
   setupRede();
   setupI2C();
   setupBarometro();
+  setupTermopar();
   
 
 }
@@ -147,6 +158,18 @@ void loop() {
 //....................................MAIN...................................
 
 //.......................................SETUP........................................
+void setupTermopar(){
+  Serial.begin(9600);
+  Serial.println("-------------------------------");
+  Serial.println(" Nanoshield Serial Thermometer");
+  Serial.println("-------------------------------");
+  Serial.println("");
+
+  // Initialize the thermocouple
+  // The CS pin can be passed as a parameter if different than pin D8,
+  //  e.g. thermocouple.begin(7)
+  thermocouple.begin();
+}
 
 void setupPin(){
   
@@ -259,10 +282,11 @@ void readSensors(){
   
   char bffr [10000];
   
-  sprintf (bffr,"python /opt/weblabmotor/python/database-insert.py /tmp/weblabmotor/temp.db %d %d %d %d 4 4 2 3", dadosSensores.tempTPA, dadosSensores.tempBAR,dadosSensores.presBAR,dadosSensores.altBAR); 
+  sprintf (bffr,"python /opt/weblabmotor/python/database-insert.py /tmp/weblabmotor/temp.db %d %d %d %d 4 4 2 3", dadosSensores.tempTPAext, dadosSensores.tempBAR,dadosSensores.presBAR,dadosSensores.altBAR); 
   //system(bffr);
   
-  dadosSensores.tempTPA = 0;
+  dadosSensores.tempTPAext = 0;
+  dadosSensores.tempTPAint = 0;
   dadosSensores.tempBAR = 0;
   dadosSensores.presBAR = 0;
   dadosSensores.altBAR = 0;  
@@ -317,20 +341,24 @@ void verificarComandos(EthernetClient client){
 
 void temperaturaTermopar(){
   
-  int i;
-  int calotaBrancaAnalog = A0;
-  
-  //Coleta 5 amostas
-  for (i = 0; i < 5; i++){
-  calotaBrancaAnalog = calotaBrancaAnalog + analogRead(A0);
+  // Read thermocouple data
+  thermocouple.read();
+
+  if (thermocouple.isShortedToVcc()) {
+    Serial.println("Thermocouple is Shorted to VCC");
+    dadosSensores.tempTPAext = 0 ;
+  } else if (thermocouple.isShortedToGnd()) {
+    Serial.println("Thermocouple is Shorted to GND");
+    dadosSensores.tempTPAext = 0 ;
+  } else if (thermocouple.isOpen()) {
+    Serial.println("Thermocouple Open circuit");
+    dadosSensores.tempTPAext = 0 ;
+  }else{
+    dadosSensores.tempTPAext = thermocouple.getExternal();    
   }
+
+  dadosSensores.tempTPAint = thermocouple.getInternal();
   
-  //Media das 5 amostras
-  calotaBrancaAnalog = calotaBrancaAnalog/5;
-  
-  float temperaturaCalotaBranca=(5*calotaBrancaAnalog*100)/1023;
-  
-  dadosSensores.tempTPA = temperaturaCalotaBranca;
 }
 
 void controlarMotor(){
