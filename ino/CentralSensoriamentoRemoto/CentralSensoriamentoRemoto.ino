@@ -280,10 +280,21 @@ void readSensors(){
   temperaturaTermopar();
   barometro();
   
-  char bffr [10000];
+  FILE * pFile;
+  pFile = fopen ("/var/lib/weblabmotor/temp.csv", "a");
   
-  sprintf (bffr,"python /opt/weblabmotor/python/database-insert.py /tmp/weblabmotor/temp.db %d %d %d %d 4 4 2 3", dadosSensores.tempTPAext, dadosSensores.tempBAR,dadosSensores.presBAR,dadosSensores.altBAR); 
-  //system(bffr);
+  if(!pFile){
+    char headerBuffer[] = {'Termopar','BarTemp','BarPressao','BarAlt'};
+    //sprintf (headerBuffer,"Termopar,BarTemp,BarPressao,BarAlt"); 
+    fwrite (headerBuffer , sizeof(char), sizeof(headerBuffer), pFile);
+  }
+  
+  char sensorBuffer [10];
+  //sprintf (sensorBuffer,"%d,%d,%d,%d", dadosSensores.tempTPAext, dadosSensores.tempBAR,dadosSensores.presBAR,dadosSensores.altBAR); 
+  //sprintf (sensorBuffer,"1,2,3,4", dadosSensores.tempTPAext, dadosSensores.tempBAR,dadosSensores.presBAR,dadosSensores.altBAR); 
+  
+  //Serial.println(sensorBuffer); 
+  fwrite (sensorBuffer , sizeof(char), sizeof(sensorBuffer), pFile);
   
   dadosSensores.tempTPAext = 0;
   dadosSensores.tempTPAint = 0;
@@ -291,7 +302,26 @@ void readSensors(){
   dadosSensores.presBAR = 0;
   dadosSensores.altBAR = 0;  
 
-  Serial.println(bffr); 
+
+}
+
+void tempoAtual(){
+
+  char buf[9];
+
+  system("date '+%H:%M:%S' > /home/root/time.txt");  //get current time in the format- hours:minutes:secs //and save in text file time.txt located in /home/root
+
+  FILE *fp;
+
+  fp = fopen("/home/root/time.txt", "r");
+
+  fgets(buf, 9, fp);
+
+  fclose(fp);
+
+  Serial.print("The current time is ");
+
+  Serial.println(buf);
 }
 
 void verificarComandos(EthernetClient client){
