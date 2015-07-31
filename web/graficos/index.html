@@ -16,7 +16,7 @@
     <div id="container" style="height: 400px"></div>
         <script type="text/javascript">
 			$(function () {
-				$.get('../database/temp.csv', function(data) {
+				$.get('../database/main.csv', function(data) {
 				 $('#container').highcharts({
 							chart: {
 								type: 'line',
@@ -26,7 +26,7 @@
                                 enabled: true
                             },
 							title: {
-								 text: 'Gráfico de temperaturas',
+								 text: 'Geral',
                                  x: -20
 							},
 							xAxis: {
@@ -36,7 +36,7 @@
 							},
 							yAxis: {
 								 title: {
-                                        text: '°C'
+                                        text: 'X'
                                     },
                                     plotLines: [{
                                         value: 0,
