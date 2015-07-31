@@ -14,7 +14,6 @@
 <body>
 
     <div id="container" style="height: 400px"></div>
-        
         <script type="text/javascript">
 			$(function () {
 				$.get('../database/temp.csv', function(data) {
@@ -72,78 +71,5 @@
 				});
 			});
     </script>
-    
 </body>
 </html>
-
-<!--
-            function requestData() {    
-              $.ajax({
-                  url: '/cgi-bin/python/database-reader.py?bd=/tmp/weblabmotor/temp.db',
-                  type: "GET",
-                  dataType: "json",
-                  success: function(data) {
-                     
-                     chart.xAxis[0].setCategories(data[0].DATA);
-
-                      chart.addSeries({
-                        name: "a0",
-                        data: data[1].A0,
-                      });
-
-                      chart.addSeries({
-                        name: "a1",
-                        data: data[2].A1,
-                      });
-
-                  },
-                  cache: false
-              });
-            }
-
-            function updateData() {    
-              $.ajax({
-                  url: '/cgi-bin/python/database-reader.py?bd=/tmp/weblabmotor/temp.db',
-                  type: "GET",
-                  dataType: "json",
-                  success: function(data) {
-                     
-                     chart.xAxis[0].setCategories(data[0].DATA);
-
-                      chart.series[0].update({
-                        pointStart: data[1].pointStart,
-			    		data: data[1].A0
-                      }, true);
-
-                      chart.series[1].update({
-                        pointStart: data[2].pointStart,
-			    		data: data[2].A1
-                      }, true);
-
-                  },
-                  cache: false
-              });
-            }
-            
-
-        </script>
-
-    </head>
-    <body>
-        <input type="button" value="Atualizar" onclick="updateData()">
-
-        <iframe name="nada" style="display:none;"></iframe>
-        <form action="/cgi-bin/python/database-transfer.py?bdOrigem=/tmp/weblabmotor/temp.db&bdAlvo=/var/lib/weblabmotor/sensores.db" method="post" target="nada">
-		<input type="submit" value="Gravar" /><br>
-        </form>
-
-        <form action="/cgi-bin/python/database-reset.py?bd=/tmp/weblabmotor/temp.db" method="post" target="nada">
-		<input type="submit" value="Apagar" /><br>
-        </form>
-
-        <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto">
-        </div>    
-    </body>
-</html>
-
--->
