@@ -52,13 +52,14 @@ A5
 
 
 struct dadosCSR {       
-    char msg[50];       //50 bytes      
-    int tempCSR;   //2 bytes
+    char msg[50];
+    int tempCSR;
     int tempTPAint;
     int tempTPAext;
-    int tempBAR;   //2 bytes
-    int presBAR;   //2 bytes 
-    int altBAR;   //2 bytes   
+    int tempBAR;
+    int presBAR;
+    int altBAR;
+    char tempo[50];
 }; 
 
 //variável global que contém todos os elementos da estrutura
@@ -133,11 +134,11 @@ void setup() {
   // Inicia-se a comunicaço serial e aguarda uma resposta
   Serial.begin(9600);
 
-  setupPin();
+  //setupPin();
   setupRede();
   setupI2C();
-  setupBarometro();
-  setupTermopar();
+  //setupBarometro();
+  //setupTermopar();
   
 
 }
@@ -275,26 +276,31 @@ void executarComandoRecebido(){
 }
 
 void readSensors(){
-
+  
+  tempoAtual();
   temperaturaCSR();
-  temperaturaTermopar();
-  barometro();
+  //temperaturaTermopar();
+  //barometro();
   
   FILE * pFile;
-  pFile = fopen ("/var/lib/weblabmotor/temp.csv", "a");
-  
+  pFile = fopen ("/opt/weblabmotor/web/database/main.csv", "a");
+    
+  /*  
   if(!pFile){
-    char headerBuffer[] = {'Termopar','BarTemp','BarPressao','BarAlt'};
+    char headerBuffer[] = "Termopar,BarTemp,BarPressao,BarAlt";
     //sprintf (headerBuffer,"Termopar,BarTemp,BarPressao,BarAlt"); 
     fwrite (headerBuffer , sizeof(char), sizeof(headerBuffer), pFile);
+    fclose(pFile);
+    Serial.println("header ok");
   }
+  */
   
-  char sensorBuffer [10];
-  //sprintf (sensorBuffer,"%d,%d,%d,%d", dadosSensores.tempTPAext, dadosSensores.tempBAR,dadosSensores.presBAR,dadosSensores.altBAR); 
-  //sprintf (sensorBuffer,"1,2,3,4", dadosSensores.tempTPAext, dadosSensores.tempBAR,dadosSensores.presBAR,dadosSensores.altBAR); 
+  char sensorBuffer [26];
+  sprintf (sensorBuffer,"%s,%d,%d,%d,%d,%d", dadosSensores.tempo, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempCSR); 
   
-  //Serial.println(sensorBuffer); 
+  Serial.println(sensorBuffer); 
   fwrite (sensorBuffer , sizeof(char), sizeof(sensorBuffer), pFile);
+  fclose(pFile);
   
   dadosSensores.tempTPAext = 0;
   dadosSensores.tempTPAint = 0;
@@ -307,21 +313,23 @@ void readSensors(){
 
 void tempoAtual(){
 
-  char buf[9];
+  char buf[20];
 
-  system("date '+%H:%M:%S' > /home/root/time.txt");  //get current time in the format- hours:minutes:secs //and save in text file time.txt located in /home/root
+  system("date '+%s%3N' > /home/root/time.txt");
 
   FILE *fp;
 
   fp = fopen("/home/root/time.txt", "r");
 
-  fgets(buf, 9, fp);
+  fgets(buf, 20, fp);
 
   fclose(fp);
+  
+  strcpy(dadosSensores.tempo,buf);
+  
+  //Serial.print("The current time is ");
+  //Serial.println(buf);
 
-  Serial.print("The current time is ");
-
-  Serial.println(buf);
 }
 
 void verificarComandos(EthernetClient client){
