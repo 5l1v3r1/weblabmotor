@@ -296,9 +296,9 @@ void readSensors(){
   */
   
   char sensorBuffer [26];
-  sprintf (sensorBuffer,"%s,%d,%d,%d,%d,%d", dadosSensores.tempo, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempCSR); 
+  sprintf (sensorBuffer,"%s,%d,%d,%d,%d,%d\n", dadosSensores.tempo, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempCSR); 
   
-  Serial.println(sensorBuffer); 
+  //Serial.println(sensorBuffer); 
   fwrite (sensorBuffer , sizeof(char), sizeof(sensorBuffer), pFile);
   fclose(pFile);
   
@@ -324,6 +324,8 @@ void tempoAtual(){
   fgets(buf, 20, fp);
 
   fclose(fp);
+  
+  buf[strlen(buf) - 1] = '\0';
   
   strcpy(dadosSensores.tempo,buf);
   
