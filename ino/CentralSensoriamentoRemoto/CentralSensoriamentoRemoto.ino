@@ -283,7 +283,7 @@ void readSensors(){
   //barometro();
   
   FILE * pFile;
-  pFile = fopen ("/opt/weblabmotor/web/database/main.csv", "a");
+  pFile = fopen ("/opt/weblabmotor/web/database/main.csv", "a+");
     
   /*  
   if(!pFile){
@@ -295,13 +295,15 @@ void readSensors(){
   }
   */
   
-  char sensorBuffer [26];
+  char sensorBuffer [25];
   sprintf (sensorBuffer,"%s,%d,%d,%d,%d,%d\n", dadosSensores.tempo, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempCSR); 
   
-  //Serial.println(sensorBuffer); 
+  //Serial.print(sensorBuffer); 
   fwrite (sensorBuffer , sizeof(char), sizeof(sensorBuffer), pFile);
   fclose(pFile);
   
+  memset(sensorBuffer, 0, 50);
+  memset(dadosSensores.tempo, 0, 50);
   dadosSensores.tempTPAext = 0;
   dadosSensores.tempTPAint = 0;
   dadosSensores.tempBAR = 0;
