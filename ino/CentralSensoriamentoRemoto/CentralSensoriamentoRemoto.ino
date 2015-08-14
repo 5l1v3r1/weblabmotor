@@ -262,6 +262,10 @@ void executarComandoRecebido(){
     
     case '3':
     flagReadSensors = false;
+    client.stop();
+    break;
+    
+    case '4':
     system("rm /opt/weblabmotor/web/database/*.csv");
     client.stop();
     break;
