@@ -84,6 +84,7 @@ int statusMotor;
 //Comando recebido com sucesso
 boolean runCommand = false;
 boolean flagReadSensors = false;
+boolean flagCreateFile = false;
 
 //temperatura placa
 char scale[4];
@@ -153,8 +154,11 @@ void loop() {
   executarComandoRecebido();
   
   if(flagReadSensors){
+    delay(1000);
     readSensors();    
   }
+  
+  delay(1000);
 }
 //....................................MAIN...................................
 
@@ -252,11 +256,13 @@ void executarComandoRecebido(){
     
     case '2':
     flagReadSensors = true;
+    flagCreateFile = true;
     client.stop();
     break;
     
     case '3':
     flagReadSensors = false;
+    system("rm /opt/weblabmotor/web/database/*.csv");
     client.stop();
     break;
     
@@ -284,18 +290,15 @@ void readSensors(){
   
   FILE * pFile;
   pFile = fopen ("/opt/weblabmotor/web/database/main.csv", "a+");
+  char sensorBuffer [25];    
     
-  /*  
-  if(!pFile){
-    char headerBuffer[] = "Termopar,BarTemp,BarPressao,BarAlt";
-    //sprintf (headerBuffer,"Termopar,BarTemp,BarPressao,BarAlt"); 
+  if(flagCreateFile){
+    char headerBuffer [52];    
+    sprintf (headerBuffer,"Tempo,Termopar,TempBar,PresAt,Altitude,Processador\n"); 
     fwrite (headerBuffer , sizeof(char), sizeof(headerBuffer), pFile);
-    fclose(pFile);
-    Serial.println("header ok");
+    flagCreateFile = false;
   }
-  */
-  
-  char sensorBuffer [25];
+
   sprintf (sensorBuffer,"%s,%d,%d,%d,%d,%d\n", dadosSensores.tempo, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempCSR); 
   
   //Serial.print(sensorBuffer); 
@@ -309,8 +312,6 @@ void readSensors(){
   dadosSensores.tempBAR = 0;
   dadosSensores.presBAR = 0;
   dadosSensores.altBAR = 0;  
-
-
 }
 
 void tempoAtual(){
@@ -354,8 +355,8 @@ void verificarComandos(EthernetClient client){
     Serial.println("]");
 
     runCommand = true;
-    
-      if ( c >= 0 & c <= 127 ){// Testa se o caracter é valido. (client.read irá enviar -1 para sinalizar que não existem mais dados)
+    /*
+     if ( c >= 0 & c <= 127 ){// Testa se o caracter é valido. (client.read irá enviar -1 para sinalizar que não existem mais dados)
       
       Serial.println("Caracter valido");
       
@@ -374,7 +375,7 @@ void verificarComandos(EthernetClient client){
         client.stop(); // Fechar qualquer conexao
         runCommand = false; 
       }
-        
+      */ 
     }
   
   }
