@@ -293,7 +293,7 @@ void readSensors(){
   char sensorBuffer [25];    
     
   if(flagCreateFile){
-    char headerBuffer [52];    
+    char headerBuffer [51];    
     sprintf (headerBuffer,"Tempo,Termopar,TempBar,PresAt,Altitude,Processador\n"); 
     fwrite (headerBuffer , sizeof(char), sizeof(headerBuffer), pFile);
     flagCreateFile = false;
