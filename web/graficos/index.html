@@ -1,6 +1,5 @@
-<!DOCTYPE html>
- 
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html>
+
 <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         
@@ -11,65 +10,120 @@
         <script src="../libs/export-csv/export-csv.js"></script>
         
 </head>
-<body>
 
-    <div id="container" style="height: 400px"></div>
-        <script type="text/javascript">
-			$(function () {
-				$.get('../database/main.csv', function(data) {
-				 $('#container').highcharts({
-							chart: {
-								type: 'line',
-								zoomType: 'xy'
-							},
-        					exporting: {
-                                enabled: true
-                            },
-							title: {
-								 text: 'Geral',
-                                 x: -20
-							},
-							xAxis: {
-							    title: {
-                                    text: 'Data'
-                                },
-							},
-							yAxis: {
-								 title: {
-                                        text: 'X'
-                                    },
-                                    plotLines: [{
-                                        value: 0,
-                                        width: 1,
-                                        color: '#808080'
-                                    }]
-							},
-        					legend: {
-                                layout: 'vertical',
-                                align: 'right',
-                                verticalAlign: 'top',
-                                x: -10,
-                                y: 100,
-                                borderWidth: 0
-                            },
-    				         data: {
-                                    csv: data,
-			                },
-							plotOptions: {
-								series: {
-									marker: {
-										enabled: false
-									}
-								},
-								area: {
-								    pointStart: Date.UTC(2011, 0, 1),
-									pointInterval: (24 * 3600 * 1000), // one day
-									enableMouseTracking: true
-								}
-							}
-					});
-				});
-			});
+<body>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+
+   <script type="text/javascript">
+
+	    var options = {
+	        chart: {
+	            renderTo: 'container',
+	            type: 'line',
+				zoomType: 'xy'
+	        },
+			exporting: {
+                enabled: true
+            },
+	        title: {
+	            text: 'Geral'
+	        },
+	        subtitle: {
+	            text: 'Dados de todos os sensores da CSR',
+	            x: -20
+	        },
+	        xAxis: {
+	            categories: [],
+	            minTickInterval: 10,
+	            TickInterval: 10,
+	            tickmarkPlacement: "on",
+	            title: {
+                        text: 'Data'
+                	},
+	            labels: {
+	                padding: 5,
+	                align: "center",
+	                style: {
+	                    fontSize: "10px"
+	                }
+	            }
+	        },
+	        yAxis: [{ //primary y axis	
+	            min: 0,
+	            max: 50,
+	            title: {
+	                text: "DADO W"
+	            },
+	            reversed: !0,
+	            plotLines: [{
+	                value: 0,
+	                width: 1,
+	                color: "#808080"
+	            }],
+	        	}, { //secondary y axis 
+	            max: 10,
+	            min: 0,
+	            title: {
+	                text: "DADO Z"
+	            },
+	            plotLines: [{
+	                value: 0,
+	                width: 1,
+	                color: "#808080"
+	            }],
+	            opposite: !0,
+	            reversed: !1
+	        }],
+	        series: []
+	    };
+
+	    $.get('../database/sample.txt', function (data) {
+	        var lines = data.split('\n');
+	        console.log(lines.length);
+
+	        options.series.push({
+	            name: "DADO W",
+	            data: [],
+	            tooltip: {
+	                valueSuffix: "  mm/hr."
+	            },
+				marker: {
+					enabled: false
+				},
+	            color: "#0000ff"
+	        }, {
+	            name: "DADO Z",
+	            data: [],
+	            tooltip: {
+	                valueSuffix: " mm"
+	            },
+	            yAxis: 1,
+	            color: "#ff0000"
+	        });
+
+	        $.each(lines, function (lineNo, line) {
+	            var items = line.split(',');
+	            
+	                $.each(items, function (itemNo, item) {
+	                    if (itemNo === 0) {
+	                        options.xAxis.categories.push(item);
+	                    } else if (itemNo === 2) {
+	                        options.series[0].data.push(parseFloat(item));
+	                    } else if (itemNo === 3) {
+	                        options.series[1].data.push(parseFloat(item));
+	                    }
+	                });
+	            
+	        });
+	        var chart = new Highcharts.Chart(options);
+	    });
+	
     </script>
+
+<div id="container" style="width: 800px; height: 500px; margin: 0 auto"></div>
+
 </body>
+
+
 </html>
+

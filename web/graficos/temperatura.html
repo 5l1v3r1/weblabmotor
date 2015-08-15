@@ -33,16 +33,13 @@
           },
           plotOptions: {
             series: {
-              //pointStart: Date.UTC(1970, 0, 1),
-              pointInterval: (24 * 3600 * 1000), // one day
               marker: {
                 enabled: true
               }
             },
           },
           xAxis: {
-              categories: [],
-              type: 'datetime',
+              categories: [],             
               minTickInterval: 10,
               TickInterval: 10,
               tickmarkPlacement: "on",
@@ -70,7 +67,7 @@
           series: []
       };
 
-      $.get('./data.csv', function (data) {
+      $.get('../database/sample.txt', function (data) {
           var lines = data.split('\n');
           console.log(lines.length);
 
