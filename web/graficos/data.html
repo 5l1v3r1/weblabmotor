@@ -16,11 +16,13 @@
 
    <script type="text/javascript">
 
-	function filter(from, to) {
+
+	
 	    var options = {
 	        chart: {
 	            renderTo: 'container',
 	            type: 'line',
+				zoomType: 'xy',
 	            width:800,
 	            height: 450
 	        },
@@ -56,54 +58,6 @@
 	                width: 1,
 	                color: "#808080"
 	            }],
-	            plotBands: [{
-	                color: '#86e3e7',
-	                from: 0,
-	                to: 2.5,
-	                label: {
-	                    text: 'Light',
-	                    align: 'left',
-	                    x: 10
-	                }
-	            }, {
-	                color: '#8aa7fd',
-	                from: 2.5,
-	                to: 7.5,
-	                label: {
-	                    text: 'Moderate',
-	                    align: 'left',
-	                    x: 10
-	                }
-	            }, {
-	                color: '#8686dc',
-	                from: 7.5,
-	                to: 15,
-	                label: {
-	                    text: 'Heavy',
-	                    align: 'left',
-	                    x: 10
-	                }
-	            }, {
-	                color: '#fed88d',
-	                from: 15,
-	                to: 30,
-	                label: {
-	                    text: 'Intense',
-	                    align: 'left',
-	                    x: 10
-	                }
-	            }, {
-	                color: '#fe9686',
-	                from: 30,
-	                to: 100,
-	                label: {
-	                    text: 'Torrential',
-	                    align: 'left',
-	                    x: 10
-	                }
-	            }
-
-	            ]
 	        }, { //secondary y axis 
 	            max: 10,
 	            min: 0,
@@ -121,6 +75,7 @@
 	        gridLineDashStyle: 'solid',
 	        series: []
 	    };
+
 	    $.get('./data.csv', function (data) {
 	        var lines = data.split('\n');
 	        console.log(lines.length);
@@ -144,93 +99,28 @@
 
 	        $.each(lines, function (lineNo, line) {
 	            var items = line.split(',');
-	            if (lineNo >= from && lineNo <= to) {
+	            
 	                $.each(items, function (itemNo, item) {
 	                    if (itemNo === 0) {
 	                        options.xAxis.categories.push(item);
-	                    } else if (itemNo === 1) {
+	                    } else if (itemNo === 2) {
 	                        options.series[0].data.push(parseFloat(item));
 	                    } else if (itemNo === 3) {
 	                        options.series[1].data.push(parseFloat(item));
 	                    }
 	                });
-	            }
+	            
 	        });
 	        var chart = new Highcharts.Chart(options);
 	    });
-	}
-
-	$('#show_chart').click(function () {
-	    var from = $('select#from').val();
-	    var to = $('select#to').val();
-	    if (from < to){
-	        filter(from, to);
-	    }else{
-	        alert('Date From value should be less than to Date To value!');
-	    }
-	});
-
-	$(window).load(function () {
-	var total_amnt = 0;
-	var total_amnt1 = 0;    $.get('./data.csv', function (data) {
-	        var lines = data.split('\n');
-	        var max = lines.length;
-	        $.each(lines, function (lineNo, line) {
-	            var items = line.split(',');
-	            if (lineNo > 0){
-	            $.each(items, function (itemNo, item) {
-	                if (itemNo === 0) {
-	                    var dates = item;
-	                    $('select#from').append("<option value='" + lineNo + "'>" + dates + "</option>");
-	                    $('select#to').append("<option value='" + lineNo + "'>" + dates + "</option>");
-	                }
-	                 else if (itemNo === 2) {
-	                        var amnt = parseFloat(item);
-	                        total_amnt += amnt;
-	                     console.log(total_amnt);
-	                     //alert(total_amnt);
-	                        $('p#total_rainfall_cap').html("Total Rainfall Intensity: <b>" +total_amnt+" mm.</b>");
-	                    }
-	                else if (itemNo === 3) {
-	                        var amnt = parseFloat(item);
-	                        total_amnt1 += amnt;
-	                     console.log(total_amnt);
-	                     //alert(total_amnt);
-	                        $('p#total_rainfall_acc').html("Total Accumulated Rainfall: <b>" +total_amnt1+" mm.</b>");
-	                    }
-
-	            });
-	        }
-	        });
-	        filter(1, max);
-	    });
-
-	});
-
+	
     </script>
 
 
 
-<form class="form-inline text-center">
-    <div class="form-group">
-        <label for="from">From</label>
-        <select class="form-control" id="from">
-            <option value="">Select Date Range</option>
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="to">To</label>
-        <select class="form-control" id="to">
-            <option value="">Select Date Range</option>
-        </select>
-    </div>
-    <button type="button" class="btn btn-primary" id="show_chart">Show Chart</button>
-</form>
+<button type="button" class="btn btn-primary" id="show_chart">Show Chart</button>
+
 <div id="container" style="width: 800px; height: 500px; margin: 0 auto"></div>
-
-<p id="total_rainfall_cap"></p>
-<p id="total_rainfall_acc"></p>
-
 
 </body>
 
