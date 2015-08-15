@@ -16,21 +16,20 @@
 
    <script type="text/javascript">
 
-
-	
 	    var options = {
 	        chart: {
 	            renderTo: 'container',
 	            type: 'line',
-				zoomType: 'xy',
-	            width:800,
-	            height: 450
+				zoomType: 'xy'
 	        },
+			exporting: {
+                enabled: true
+            },
 	        title: {
-	            text: 'Cabadbaran, Agusan del Norte'
+	            text: 'Geral'
 	        },
 	        subtitle: {
-	            text: 'Source:CSU Phil-LiDAR 1',
+	            text: 'Dados de todos os sensores da CSR',
 	            x: -20
 	        },
 	        xAxis: {
@@ -38,6 +37,9 @@
 	            minTickInterval: 10,
 	            TickInterval: 10,
 	            tickmarkPlacement: "on",
+	            title: {
+                        text: 'Data'
+                	},
 	            labels: {
 	                padding: 5,
 	                align: "center",
@@ -50,7 +52,7 @@
 	            min: 0,
 	            max: 50,
 	            title: {
-	                text: "Rainfall Intensity, mm/hr."
+	                text: "DADO W"
 	            },
 	            reversed: !0,
 	            plotLines: [{
@@ -58,11 +60,11 @@
 	                width: 1,
 	                color: "#808080"
 	            }],
-	        }, { //secondary y axis 
+	        	}, { //secondary y axis 
 	            max: 10,
 	            min: 0,
 	            title: {
-	                text: "Accumulated Rainfall, mm"
+	                text: "DADO Z"
 	            },
 	            plotLines: [{
 	                value: 0,
@@ -72,7 +74,6 @@
 	            opposite: !0,
 	            reversed: !1
 	        }],
-	        gridLineDashStyle: 'solid',
 	        series: []
 	    };
 
@@ -86,6 +87,9 @@
 	            tooltip: {
 	                valueSuffix: "  mm/hr."
 	            },
+				marker: {
+					enabled: false
+				},
 	            color: "#0000ff"
 	        }, {
 	            name: "Accumulated Rainfall",
@@ -115,10 +119,6 @@
 	    });
 	
     </script>
-
-
-
-<button type="button" class="btn btn-primary" id="show_chart">Show Chart</button>
 
 <div id="container" style="width: 800px; height: 500px; margin: 0 auto"></div>
 

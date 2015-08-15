@@ -3,7 +3,7 @@
  *
  * Author:   Torstein Honsi
  * Licence:  MIT
- * Version:  1.3.2
+ * Version:  1.3.5
  */
 /*global Highcharts, window, document, Blob */
 (function (Highcharts) {
@@ -40,9 +40,16 @@
         // Loop the series and index values
         i = 0;
         each(this.series, function (series) {
-            if (series.options.includeInCSVExport !== false) {
+            var keys = series.options.keys,
+                pointArrayMap = keys || series.pointArrayMap || ['y'],
+                valueCount = pointArrayMap.length,
+                j;
+
+            if (series.options.includeInCSVExport !== false && series.visible !== false) { // #55
                 names.push(series.name);
+
                 each(series.points, function (point) {
+                    j = 0;
                     if (!rows[point.x]) {
                         rows[point.x] = [];
                     }
@@ -53,9 +60,13 @@
                         rows[point.x].name = point.name;
                     }
 
-                    rows[point.x][i] = point.y;
+                    while (j < valueCount) {
+                        rows[point.x][i + j] = point[pointArrayMap[j]];
+                        j = j + 1;
+                    }
+
                 });
-                i += 1;
+                i = i + j;
             }
         });
 
@@ -76,8 +87,19 @@
         // Transform the rows to CSV
         each(rowArr, function (row) {
 
+            var category = row.name;
+            if (!category) {
+                if (xAxis.isDatetimeAxis) {
+                    category = Highcharts.dateFormat(dateFormat, row.x);
+                } else if (xAxis.categories) {
+                    category = Highcharts.pick(xAxis.names[row.x], xAxis.categories[row.x], row.x)
+                } else {
+                    category = row.x;
+                }
+            }
+
             // Add the X/date/category
-            row.unshift(row.name || (xAxis.isDatetimeAxis ? Highcharts.dateFormat(dateFormat, row.x) : xAxis.categories ? Highcharts.pick(xAxis.categories[row.x], row.x) : row.x));
+            row.unshift(category);
             dataRows.push(row);
         });
 
@@ -137,7 +159,7 @@
                 n = useLocalDecimalPoint ? (1.1).toLocaleString()[1] : '.';
 
             html += '<tr>';
-            for (j = 0; j < row.length; j++) {
+            for (j = 0; j < row.length; j = j + 1) {
                 val = row[j];
                 // Add the cell
                 if (typeof val === 'number') {
@@ -157,19 +179,27 @@
         return html;
     };
 
-    function getContent(chart, href, extention, content, MIME) {
+    function getContent(chart, href, extension, content, MIME) {
         var a,
             blobObject,
-            name = (chart.title ? chart.title.textStr.replace(/ /g, '-').toLowerCase() : 'chart'),
+            name,
             options = (chart.options.exporting || {}).csv || {},
             url = options.url || 'http://www.highcharts.com/studies/csv-export/download.php';
+
+        if (chart.options.exporting.filename) {
+            name = chart.options.exporting.filename;
+        } else if (chart.title) {
+            name = chart.title.textStr.replace(/ /g, '-').toLowerCase();
+        } else {
+            name = 'chart';
+        }
 
         // Download attribute supported
         if (downloadAttrSupported) {
             a = document.createElement('a');
             a.href = href;
             a.target      = '_blank';
-            a.download    = name + '.' + extention;
+            a.download    = name + '.' + extension;
             document.body.appendChild(a);
             a.click();
             a.remove();
@@ -177,14 +207,14 @@
         } else if (window.Blob && window.navigator.msSaveOrOpenBlob) {
             // Falls to msSaveOrOpenBlob if download attribute is not supported
             blobObject = new Blob([content]);
-            window.navigator.msSaveOrOpenBlob(blobObject, name + '.' + extention);
+            window.navigator.msSaveOrOpenBlob(blobObject, name + '.' + extension);
 
         } else {
             // Fall back to server side handling
             Highcharts.post(url, {
                 data: content,
                 type: MIME,
-                extension: extention
+                extension: extension
             });
         }
     }
@@ -217,7 +247,9 @@
                 '</head><body>' +
                 this.getTable(true) +
                 '</body></html>',
-            base64 = function (s) { return window.btoa(decodeURIComponent(encodeURIComponent(s))); };
+            base64 = function (s) { 
+                return window.btoa(unescape(encodeURIComponent(s))); // #50
+            };
         getContent(
             this,
             uri + base64(template),
