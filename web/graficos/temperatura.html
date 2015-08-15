@@ -15,6 +15,7 @@
 
    <script type="text/javascript">
 
+function render (){
       var options = {
           chart: {
             renderTo: 'container',
@@ -69,7 +70,6 @@
 
       $.get('../database/sample.txt', function (data) {
           var lines = data.split('\n');
-          console.log(lines.length);
 
           options.series.push({
               name: "Bloco",
@@ -101,6 +101,8 @@
           });
           var chart = new Highcharts.Chart(options);
       });
+}
+window.setInterval(render, 5000);
 
     </script>
 
