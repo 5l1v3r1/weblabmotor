@@ -1,20 +1,52 @@
 /*
-
+--------------------------------
+LCD: LCD
+(1)VSS <-> GND
+(2)VDD <-> +5V
+(3)V0 <-> +5V
+(4)RS <-> D8
+(5)R/W <-> GND
+(6)E <-> D7
+(7)D0 <-> X
+(8)D1 <-> X
+(9)D2 <-> X
+(10)D3 <-> X
+(11)D4 <-> D6
+(12)D5 <-> D5
+(13)D6 <-> D4
+(14)D7 <-> D3
+(15)LED <-> +5V ou GND
+(16)LED <-> +5V ou GND
+--------------------------------
 Barometro: GY-65
 SDA <-> SDA
 SCL <-> SCL
-VCC <-> 3.3V
-
-LCD: LCD
-
-
+VCC <-> +3.3V
+GND <-> GND
+--------------------------------
 Termopar: TPA
 GND <-> GND
 GND <-> GND
-D8 <-> D8
+D8 <-> D2
 SDO <-> 12
 SCK <-> 13
-5V <-> 5V
+5V <-> +5V
+--------------------------------
+Amperimetro: AMP
+GND <-> GND
+VCC <-> +5V
+OUT <-> A0
+--------------------------------
+Voltimetro: VLT
+GND <-> GND
+VCC <-> +5V
+OUT <-> A1
+--------------------------------
+Rotacao: ROT
+GND <-> GND
+VCC <-> +5V
+OUT <-> A2
+--------------------------------
 --------------------------------
 SCL GY-65
 SDA GY-65
@@ -24,24 +56,24 @@ D12 TPA
 D11~
 D10~
 D9~
-D8 TPA
-D7
-D6~
-D5~
-D4
-D3~
-D2
+D8 LCD
+D7 LCD
+D6~ LCD
+D5~ LCD
+D4 LCD
+D3~ LCD
+D2 TPA
 D1
 D0
 
-A0
-A1
-A2
+A0 AMP
+A1 VLT
+A2 ROT
 A3
 A4
 A5
-   
 */
+
 #include "I2Cdev.h"
 #include "MPU6050.h"
 #include "BMP085.h"
