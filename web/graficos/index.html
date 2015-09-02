@@ -49,8 +49,8 @@
 	            }
 	        },
 	        yAxis: [{ //primary y axis	
-	            min: 0,
-	            max: 50,
+	            //min: 0,
+	            //max: 50,
 	            title: {
 	                text: "DADO W"
 	            },
@@ -61,8 +61,8 @@
 	                color: "#808080"
 	            }],
 	        	}, { //secondary y axis 
-	            max: 10,
-	            min: 0,
+	           // max: 10,
+	           // min: 0,
 	            title: {
 	                text: "DADO Z"
 	            },
@@ -107,9 +107,9 @@
 	                $.each(items, function (itemNo, item) {
 	                    if (itemNo === 0) {
 	                        options.xAxis.categories.push(item);
-	                    } else if (itemNo === 2) {
+	                    } else if (itemNo === 1) {
 	                        options.series[0].data.push(parseFloat(item));
-	                    } else if (itemNo === 3) {
+	                    } else if (itemNo === 2) {
 	                        options.series[1].data.push(parseFloat(item));
 	                    }
 	                });
