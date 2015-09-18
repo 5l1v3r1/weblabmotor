@@ -10,9 +10,9 @@ case ${option} in
       ;; 
    -d) DIR="${2}" 
       echo "Configurando diretorios de acesso web para linux debian like"
-          sudo ln -s -T /opt/weblabmotor/web/ /var/www/home
-          sudo chown -R www-data.www-data /var/www/home
-          sudo chmod -R 755 /var/www/home
+          sudo ln -s -T /opt/weblabmotor/web/ /var/www/html/home
+          sudo chown -R www-data.www-data /var/www/html/home
+          sudo chmod -R 755 /var/www/html/home
       ;; 
    *)  
       echo "`basename ${0}`:usage: [-y yocto] | [-d debianLike]" 
