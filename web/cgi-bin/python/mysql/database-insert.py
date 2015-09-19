@@ -28,4 +28,4 @@ print "Status: 200 OK"
 print "Content-Type: text/html"
 print ""
 print "%s" %(dados)
-print "<br>"
+con.close()
