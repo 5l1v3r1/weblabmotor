@@ -100,7 +100,11 @@ struct dadosCSR {
 Nanoshield_Thermocouple thermocouple;
 
 //Endereco MAC para o shield Ethernet
-byte mac[] = { 0x98, 0x4F, 0xEE, 0x00, 0x25, 0x6F };
+//byte mac[] = { 0x98, 0x4F, 0xEE, 0x00, 0x25, 0x6F };
+byte mac[] = { 0x98, 0x4F, 0xEE, 0x01, 0x14, 0x8A };
+
+IPAddress serverMySQL(192,168,1,38);  // numeric IP for MySQL server
+
 EthernetClient client;
 EthernetServer server(10000);
 
@@ -115,7 +119,8 @@ int statusMotor;
 //Flags
 //Comando recebido com sucesso
 boolean runCommand = false;
-boolean flagReadSensors = false;
+boolean flagReadSensorsCSV = false;
+boolean flagReadSensorsHTTP = false;
 boolean flagCreateFile = false;
 
 //temperatura placa
@@ -169,7 +174,7 @@ void setup() {
 
   //setupPin();
   setupRede();
-  setupI2C();
+  //setupI2C();
   //setupBarometro();
   //setupTermopar();
   
@@ -185,9 +190,14 @@ void loop() {
   
   executarComandoRecebido();
   
-  if(flagReadSensors){
+  if(flagReadSensorsCSV){
     delay(1000);
-    readSensors();    
+    readSensorsCSV();    
+  }
+
+  if(flagReadSensorsHTTP){
+    delay(1000);
+    readSensorsHTTP();    
   }
   
   delay(1000);
@@ -287,18 +297,28 @@ void executarComandoRecebido(){
     break;
     
     case '2':
-    flagReadSensors = true;
+    flagReadSensorsCSV = true;
     flagCreateFile = true;
     client.stop();
     break;
     
     case '3':
-    flagReadSensors = false;
+    flagReadSensorsCSV = false;
     client.stop();
     break;
     
     case '4':
     system("rm /opt/weblabmotor/web/database/*.csv");
+    client.stop();
+    break;
+
+    case '5':
+    flagReadSensorsHTTP = true;
+    client.stop();
+    break;
+
+    case '6':
+    flagReadSensorsHTTP = false;
     client.stop();
     break;
     
@@ -317,7 +337,7 @@ void executarComandoRecebido(){
   }
 }
 
-void readSensors(){
+void readSensorsCSV(){
   
   tempoAtual();
   temperaturaCSR();
@@ -343,6 +363,46 @@ void readSensors(){
   
   memset(sensorBuffer, 0, 50);
   memset(dadosSensores.tempo, 0, 50);
+  dadosSensores.tempTPAext = 0;
+  dadosSensores.tempTPAint = 0;
+  dadosSensores.tempBAR = 0;
+  dadosSensores.presBAR = 0;
+  dadosSensores.altBAR = 0;  
+}
+
+void readSensorsHTTP(){
+ 
+  EthernetClient clientMySQL;
+  
+  tempoAtual();
+  temperaturaCSR();
+  //temperaturaTermopar();
+  //barometro();
+  
+    if (clientMySQL.connect(serverMySQL, 80)) {
+   
+    Serial.println("connected");
+   
+    // Make a HTTP request:
+    char headerBuffer [87];
+    sprintf (headerBuffer,"GET /home/cgi-bin/python/mysql/database-insert.py?a0=%d;a1=%d;a2=%d;a3=%d;a4=%d;a5=%d HTTP/1.1",dadosSensores.tempo, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempCSR);
+    //Serial.println(headerBuffer);
+    clientMySQL.println(headerBuffer);
+    clientMySQL.println("Host: 192.168.1.38");
+    clientMySQL.println("Connection: close");
+    clientMySQL.println();
+    Serial.println("disconnecting.");
+
+    //limpar dados remanescentes e fechar conexao
+    memset(headerBuffer, 0, 87);
+    clientMySQL.flush();
+    clientMySQL.stop();
+  }
+  else {
+    // kf you didn't get a connection to the server:
+    Serial.println("connection failed");
+  }
+  
   dadosSensores.tempTPAext = 0;
   dadosSensores.tempTPAint = 0;
   dadosSensores.tempBAR = 0;
