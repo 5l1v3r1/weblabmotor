@@ -77,46 +77,12 @@
 	        series: []
 	    };
 
-	    $.get('../database/sample.txt', function (data) {
-	        var lines = data.split('\n');
-	        console.log(lines.length);
-
-	        options.series.push({
-	            name: "DADO W",
-	            data: [],
-	            tooltip: {
-	                valueSuffix: "  mm/hr."
-	            },
-				marker: {
-					enabled: false
-				},
-	            color: "#0000ff"
-	        }, {
-	            name: "DADO Z",
-	            data: [],
-	            tooltip: {
-	                valueSuffix: " mm"
-	            },
-	            yAxis: 1,
-	            color: "#ff0000"
-	        });
-
-	        $.each(lines, function (lineNo, line) {
-	            var items = line.split(',');
-	            
-	                $.each(items, function (itemNo, item) {
-	                    if (itemNo === 0) {
-	                        options.xAxis.categories.push(item);
-	                    } else if (itemNo === 1) {
-	                        options.series[0].data.push(parseFloat(item));
-	                    } else if (itemNo === 2) {
-	                        options.series[1].data.push(parseFloat(item));
-	                    }
-	                });
-	            
-	        });
-	        var chart = new Highcharts.Chart(options);
-	    });
+		$.getJSON("/home/cgi-bin/php/mysql/database-reader.php", function(json) {
+                    options.xAxis.categories = json[0]['data']; //xAxis: {categories: []}
+                    options.series[0] = json[1];
+                    options.series[1] = json[2];
+                    chart = new Highcharts.Chart(options);
+         });
 	
     </script>
 
