@@ -1,25 +1,41 @@
 <?php
+
   try
   {
     //open the database
-	$db = new PDO('mysql:host=localhost;dbname=sensores','root','root');
+	$db = new PDO('mysql:host=localhost;dbname=csr','root','root');
 
-    $result = $db->query('SELECT * FROM dados');
+    $result = $db->query('SELECT * FROM sensoresTemporario');
 
-    $bln['name'] = 'DATA';
-    $rows['name'] = 'A0';
-    $rowss['name'] = 'A1';
+    //nome para os dados nos graficos
+    $tempo['name'] = 'TEMPO';
+    $a0['name'] = 'A0';
+    $a1['name'] = 'A1';
+    $a2['name'] = 'A2';
+    $a3['name'] = 'A3';
+    $a4['name'] = 'A4';
+    $a5['name'] = 'A5';
+
     foreach($result as $row)
     {
-      $bln['data'][] = $row['data'];
-      $rows['data'][] = $row['a0'];
-      $rowss['data'][] = $row['a1'];
+      $tempo['data'][] = $row['tempo'];
+      $a0['data'][] = $row['a0'];
+      $a1['data'][] = $row['a1'];
+      $a2['data'][] = $row['a2'];
+      $a3['data'][] = $row['a3'];
+      $a4['data'][] = $row['a4'];
+      $a5['data'][] = $row['a5'];
+
     }
 
     $rslt = array();
-    array_push($rslt, $bln);
-    array_push($rslt, $rows);
-    array_push($rslt, $rowss);
+    array_push($rslt, $tempo);
+    array_push($rslt, $a0);
+    array_push($rslt, $a1);
+    array_push($rslt, $a2);
+    array_push($rslt, $a3);
+    array_push($rslt, $a4);
+    array_push($rslt, $a5);
 
     print json_encode($rslt, JSON_NUMERIC_CHECK);
 

@@ -4,10 +4,11 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
         
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-        <script src="../libs/highcharts/js/highcharts.js"></script>
+        <script src="http://code.highcharts.com/highcharts.js"></script>
         <script src="http://code.highcharts.com/modules/exporting.js"></script>
         <script src="http://code.highcharts.com/modules/data.js"></script>
-        <script src="../libs/export-csv/export-csv.js"></script>        
+        <script src="../libs/export-csv/export-csv.js"></script>
+        
 </head>
 
 <body>
@@ -17,29 +18,22 @@
 
       var options = {
           chart: {
-            renderTo: 'container',
-            type: 'line',
-            zoomType: 'xy'
+              renderTo: 'container',
+              type: 'line',
+        zoomType: 'xy'
           },
-          exporting: {
-            enabled: true
-          },
+      exporting: {
+                enabled: true
+            },
           title: {
               text: 'Temperatura'
           },
           subtitle: {
-              text: 'Dados de temperatura do motor',
+              text: 'Temperatura do bloco do motor',
               x: -20
           },
-          plotOptions: {
-            series: {
-              marker: {
-                enabled: true
-              }
-            },
-          },
           xAxis: {
-              categories: [],             
+              categories: [],
               minTickInterval: 10,
               TickInterval: 10,
               tickmarkPlacement: "on",
@@ -54,53 +48,42 @@
                   }
               }
           },
-          yAxis: [{
+          yAxis: [{ //primary y axis  
+              //min: 0,
+              //max: 50,
               title: {
-                  text: "Temperatura (°C)"
+                  text: "DADO W"
+              },
+              reversed: !0,
+              plotLines: [{
+                  value: 0,
+                  width: 1,
+                  color: "#808080"
+              }],
+            }, { //secondary y axis 
+             // max: 10,
+             // min: 0,
+              title: {
+                  text: "DADO Z"
               },
               plotLines: [{
                   value: 0,
                   width: 1,
                   color: "#808080"
               }],
+              opposite: !0,
+              reversed: !1
           }],
           series: []
       };
 
-      $.get('../database/sample.txt', function (data) {
-          var lines = data.split('\n');
-
-          options.series.push({
-              name: "Bloco",
-              data: [],
-              tooltip: {
-                  valueSuffix: "  °C"
-              }
-          }, {
-              name: "Escapamento",
-              data: [],
-              tooltip: {
-                  valueSuffix: " °C"
-              },
-          });
-
-          $.each(lines, function (lineNo, line) {
-              var items = line.split(',');
-              
-                  $.each(items, function (itemNo, item) {
-                      if (itemNo === 0) {
-                          options.xAxis.categories.push(item);
-                      } else if (itemNo === 2) {
-                          options.series[0].data.push(parseFloat(item));
-                      } else if (itemNo === 3) {
-                          options.series[1].data.push(parseFloat(item));
-                      }
-                  });
-              
-          });
-          var chart = new Highcharts.Chart(options);
-      });
-
+    $.getJSON("/home/cgi-bin/php/mysql/database-reader.php", function(json) {
+                    options.xAxis.categories = json[0]['data']; //xAxis: {categories: []}
+                    options.series[0] = json[1];
+                    options.series[1] = json[2];
+                    chart = new Highcharts.Chart(options);
+         });
+  
     </script>
 
 <div id="container" style="width: 800px; height: 500px; margin: 0 auto"></div>
