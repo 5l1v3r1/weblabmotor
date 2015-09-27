@@ -388,7 +388,7 @@ void readSensorsHTTP(){
     sprintf (headerBuffer,"GET /home/cgi-bin/python/mysql/database-insert.py?a0=%d;a1=%d;a2=%d;a3=%d;a4=%d;a5=%d HTTP/1.1",dadosSensores.tempo, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempCSR);
     //Serial.println(headerBuffer);
     clientMySQL.println(headerBuffer);
-    clientMySQL.println("Host: 192.168.1.38");
+    clientMySQL.println("Host: 192.168.0.100");
     clientMySQL.println("Connection: close");
     clientMySQL.println();
     Serial.println("disconnecting.");
