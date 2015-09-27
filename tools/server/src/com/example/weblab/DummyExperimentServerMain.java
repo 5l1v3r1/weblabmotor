@@ -6,7 +6,7 @@ import es.deusto.weblab.experimentservers.Launcher;
 public class DummyExperimentServerMain {
 	public static void main(String [] args) throws Exception{
 		IExperimentServer experimentServer = new DummyExperimentServer();
-		Launcher launcher = new Launcher(40002, experimentServer);
+		Launcher launcher = new Launcher(40005, experimentServer);
 		launcher.start();
 	}
 }

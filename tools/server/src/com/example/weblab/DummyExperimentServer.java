@@ -5,6 +5,7 @@ import java.io.File;
 import es.deusto.weblab.experimentservers.ExperimentServer;
 import es.deusto.weblab.experimentservers.exceptions.ExperimentServerInstantiationException;
 import es.deusto.weblab.experimentservers.exceptions.WebLabException;
+import sun.org.mozilla.javascript.regexp.SubString;
 
 public class DummyExperimentServer extends ExperimentServer {
 
@@ -24,16 +25,33 @@ public class DummyExperimentServer extends ExperimentServer {
 	
 	public String sendCommand(String command) {
 					
-	    String dados = "Comunicando com o experimento...";
 		ArduinoEthernetComm aec = new ArduinoEthernetComm();
-
+		
+		if(command.startsWith("usr")){
+			String comando = command.substring(4);
+			System.out.println(comando);
+			
 			try {
-				aec.CommEthArduino("192.168.0.104", 10000, command);		
+				//Unidade de Sensoriamento Remoto - GALILEO
+				aec.CommEthArduino("192.168.0.101", 10000, comando);		
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		return dados;
+			
+		}else if(command.startsWith("ucr")){
+			System.out.println("Controlar ARDUINO");
+			String comando = command.substring(4);
+			System.out.println(comando);
+	
+			try {
+				//Unidade de Controle Remoto -  ARDUINO
+				aec.CommEthArduino("192.168.0.102", 10000, comando);		
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+	
+		}	
+			return "ok";
 	}
 	
 	public void dispose() {

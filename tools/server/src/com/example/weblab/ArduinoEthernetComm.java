@@ -12,9 +12,7 @@ public class ArduinoEthernetComm
 	}
 	
 	public void CommEthArduino(String serverIP, int serverPort, String msgToServer) throws Exception
-	 {
-		  
-		  //String msgFromServer="Nada recebido do experimento";//received message will be stored here  
+	 {  
 
 		  Socket clientSocket = new Socket(serverIP, serverPort);//making the socket connection
 		  System.out.println("Connected to:"+serverIP+" on port:"+serverPort);//debug
@@ -26,7 +24,6 @@ public class ArduinoEthernetComm
 		  //BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));//
 
 		  outToServer.writeBytes(msgToServer+'\n');//sending the message
-		  //outToServer.writeBytes(msgToServer);//sending the message
 		  
 		  System.out.println("sending to Arduino-Server: "+msgToServer);//debug
 		  		  	      
