@@ -14,6 +14,12 @@ case ${option} in
           sudo chown -R www-data.www-data /var/www/home
           sudo chmod -R 755 /var/www/home/
       ;;
+      -c) DIR="${2}" 
+   echo "Configurando diretorios de acesso web para RPi"
+       ln -s -T /opt/weblabmotor/web/ /var/www/home
+       chown -R www-data.www-data /var/www/home
+       chmod -R 755 /var/www/home/
+   ;;
     -i) DIR="${2}" 
         echo "instalando pacotes para linux debian like"
         sudo apt-get update
