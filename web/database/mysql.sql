@@ -1,6 +1,6 @@
-CREATE SCHEMA `csr` DEFAULT CHARACTER SET utf8 ;
+CREATE SCHEMA `cer` DEFAULT CHARACTER SET utf8 ;
 
-CREATE TABLE `csr`.`sensoresPermanente` (
+CREATE TABLE `cer`.`usrPermanente` (
   `tempo` TIMESTAMP NOT NULL,
   `a0` INT NULL,
   `a1` INT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE `csr`.`sensoresPermanente` (
   `a5` INT NULL,
   PRIMARY KEY (`tempo`));
 
-CREATE TABLE `csr`.`sensoresTemporario` (
+CREATE TABLE `cer`.`usrTemporario` (
   `tempo` TIMESTAMP NOT NULL,
   `a0` INT NULL,
   `a1` INT NULL,
@@ -20,7 +20,7 @@ CREATE TABLE `csr`.`sensoresTemporario` (
   `a5` INT NULL,
   PRIMARY KEY (`tempo`));
 
-CREATE TABLE `csr`.`atuadores` (
+CREATE TABLE `cer.`ucr` (
   `tempo` TIMESTAMP NOT NULL,
   `d0` INT NULL,
   `d1` INT NULL,
