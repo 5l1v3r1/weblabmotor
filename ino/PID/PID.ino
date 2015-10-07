@@ -1,3 +1,8 @@
+
+#include <Servo.h>
+
+Servo myservo;  // create servo object to control a servo
+
 /*working variables*/
 unsigned long lastTime;
 double Input, Output;
@@ -20,26 +25,32 @@ bool inAuto;
 
 void setup(){
   Serial.begin(9600);
-  
+  myservo.attach(PIN_OUTPUT);  // attaches the servo on pin 9 to the servo object
   SetSampleTime(100);
-  SetOutputLimits(0,255);
+  SetOutputLimits(0,180);
   SetControllerDirection(DIRECT);
-  SetTunings(10,2,5);//kp,ki,kd
-  Setpoint = 684;
+  SetTunings(1,1,1);//kp,ki,kd
+  Setpoint = 300;
   SetMode(AUTOMATIC);
   
 }
 
 void loop(){
-  Serial.print("Input:");
-  Serial.println(Input);
+  Serial.print("Input: ");
+  Serial.print(Input);
 
   Input = analogRead(PIN_INPUT);
   Compute();
-  analogWrite(PIN_OUTPUT, Output);
+  //analogWrite(PIN_OUTPUT, Output);
+  myservo.write(Output); 
 
-  Serial.print("Output:");
+  Serial.print(" Output:");
   Serial.println(Output);
+
+  //SetSampleTime(100);
+  //SetOutputLimits(0,180);
+  //SetTunings(2,4,1);//kp,ki,kd
+  //Setpoint = 300;
   
   delay(20);
 }
@@ -53,8 +64,8 @@ void Compute()
    {
       /*Compute all the working error variables*/
       double error = Setpoint - Input;
-      Serial.print("Erro:");
-      Serial.println(error);
+      //Serial.print("Erro:");
+      //Serial.println(error);
       ITerm+= (ki * error);
       if(ITerm > outMax) ITerm= outMax;
       else if(ITerm < outMin) ITerm= outMin;
