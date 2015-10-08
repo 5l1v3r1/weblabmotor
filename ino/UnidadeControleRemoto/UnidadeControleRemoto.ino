@@ -1,4 +1,3 @@
-
 #include "SPI.h"
 #include "Ethernet.h"
 #include <Servo.h>
@@ -7,9 +6,16 @@ Servo myservo;  // create servo object to control a servo
 
 
 //Endereco MAC para o shield Ethernet
-byte mac[] = { 0x98, 0x4F, 0xEE, 0x00, 0x25, 0x6F };
+//byte mac[] = { 0x98, 0x4F, 0xEE, 0x00, 0x25, 0x6F };
+byte mac[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x3A };
+IPAddress ip(192, 168, 0, 102);
+
 EthernetClient client;
 EthernetServer server(10000);
+
+//Pino de controle do motor
+int motor = 6;
+int statusMotor;
 
 //Mensagem enviada pela comunicacao ethernet para controlar o experimento
 char c;
@@ -48,6 +54,7 @@ void setup() {
   setupRede();
   setupPID();
   setupServo();
+  setupPin();
   Serial.println("Inicializando...");
 }
 
@@ -108,13 +115,24 @@ void loop() {
         Serial.println("desativando pid");
         runPID=false;
       }
+    } else if(command.substring(0, x) == "motor"){
+      Serial.print("controlando motor");
+      controlarMotor();
+      client.stop();
+      command = "";
+    } else if(command.substring(0, x) == "k"){
+      Serial.println(command.substring(x + 1, 5)); //kp
+      //Serial.println(command.substring(5, 6)); //ki
+      //Serial.println(command.substring(9, 10)); //kd
+      client.stop();
+      command = "";
     }
       client.stop();
       command = "";
   }
 
-  Serial.println(i++);
-  delay(1000);
+  //Serial.println(i++);
+  //delay(1000);
 
 }
 
@@ -122,7 +140,7 @@ void setupRede() {
 
   if (!Ethernet.begin(mac)) {
     Serial.println("conectando com a rede...");
-    Ethernet.begin(mac);
+    Ethernet.begin(mac,ip);
     delay(1000);
   }
   delay(200);
@@ -132,6 +150,14 @@ void setupRede() {
   delay(200);
   Serial.print("IP: ");
   Serial.println(Ethernet.localIP());
+
+}
+
+
+void setupPin(){
+  
+  pinMode(motor,OUTPUT);
+  digitalWrite(motor,LOW);
 
 }
 
@@ -179,6 +205,12 @@ void ComputePID() {
   Serial.print(" Output:");
   Serial.println(Output);
 
+  Serial.print(kp);
+  Serial.print(",");
+  Serial.print(ki);
+  Serial.print(",");
+  Serial.println(kd);
+  
   delay(20);
   
 }
@@ -275,3 +307,15 @@ void SetControllerDirection(int Direction)
    controllerDirection = Direction;
 }
 
+void controlarMotor(){
+
+statusMotor = digitalRead(motor);
+ 
+  if(statusMotor == 1){
+    Serial.println("Motor ligado, desligando motor...");
+    digitalWrite(motor,LOW);
+  }else{
+    Serial.println("Motor desligado, Ligando motor...");
+    digitalWrite(motor,HIGH);
+  }
+}
