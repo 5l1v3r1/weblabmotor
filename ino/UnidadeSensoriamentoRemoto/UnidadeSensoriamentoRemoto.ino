@@ -102,6 +102,7 @@ Nanoshield_Thermocouple thermocouple;
 //Endereco MAC para o shield Ethernet
 //byte mac[] = { 0x98, 0x4F, 0xEE, 0x00, 0x25, 0x6F };
 byte mac[] = { 0x98, 0x4F, 0xEE, 0x01, 0x14, 0x8A };
+IPAddress ip(192, 168, 0, 101);
 
 IPAddress serverMySQL(192,168,1,38);  // numeric IP for MySQL server
 
@@ -111,10 +112,6 @@ EthernetServer server(10000);
 //Mensagem enviada pela comunicacao ethernet para controlar o experimento
 char c = 0;
 char command = 0;
-
-//Pino de controle do motor
-int motor = 6;
-int statusMotor;
 
 //Flags
 //Comando recebido com sucesso
@@ -218,18 +215,11 @@ void setupTermopar(){
   thermocouple.begin();
 }
 
-void setupPin(){
-  
-  pinMode(motor,OUTPUT);
-  digitalWrite(motor,LOW);
-
-}
-
 void setupRede(){
   
   if(!Ethernet.begin(mac)){
     Serial.println("conectando com a rede...");
-    Ethernet.begin(mac);
+    Ethernet.begin(mac,ip);
     delay(1000);
   }
   
@@ -290,11 +280,6 @@ void executarComandoRecebido(){
   Serial.println("] enviado...");
   
     switch(command){
-    
-    case '1':
-    controlarMotor();
-    client.stop();
-    break;
     
     case '2':
     flagReadSensorsCSV = true;
@@ -500,19 +485,6 @@ void temperaturaTermopar(){
   
 }
 
-void controlarMotor(){
-
-statusMotor = digitalRead(motor);
- 
-  if(statusMotor == 1){
-    Serial.println("Motor ligado, desligando motor...");
-    digitalWrite(motor,LOW);
-  }else{
-    Serial.println("Motor desligado, Ligando motor...");
-    digitalWrite(motor,HIGH);
-  }
-}
-
 void resetExperimento(){
 
   Serial.println("Reiniciando experimento...");
@@ -612,5 +584,3 @@ void temperaturaCSR(){
   dadosSensores.tempCSR = temp;
  
 }
-
-
