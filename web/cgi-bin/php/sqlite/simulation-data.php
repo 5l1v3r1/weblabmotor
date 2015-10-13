@@ -1,11 +1,11 @@
 <?php
 
-    $a0 = $_POST['a0'];
-    $a1 = $_POST['a1'];
-    $a2 = $_POST['a2'];
-    $a3 = $_POST['a3'];
-    $a4 = $_POST['a4'];
-    $a5 = $_POST['a5'];
+    $a0 = escapeshellarg($_POST['a0']);
+    $a1 = escapeshellarg($_POST['a1']);
+    $a2 = escapeshellarg($_POST['a2']);
+    $a3 = escapeshellarg($_POST['a3']);
+    $a4 = escapeshellarg($_POST['a4']);
+    $a5 = escapeshellarg($_POST['a5']);
     
 	if ($_POST['enviar'] & $_POST['ok']) {
 	  exec("python /opt/weblabmotor/python/inserirDados.py /tmp/weblabmotor/temp.db $a0 $a1 $a2 $a3 $a4 $a5");
