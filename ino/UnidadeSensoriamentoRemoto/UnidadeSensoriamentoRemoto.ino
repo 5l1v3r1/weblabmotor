@@ -1,76 +1,89 @@
 /*
---------------------------------
-LCD: LCD
-(1)VSS <-> GND
-(2)VDD <-> +5V
-(3)V0 <-> +5V
-(4)RS <-> D8
-(5)R/W <-> GND
-(6)E <-> D7
-(7)D0 <-> X
-(8)D1 <-> X
-(9)D2 <-> X
-(10)D3 <-> X
-(11)D4 <-> D6
-(12)D5 <-> D5
-(13)D6 <-> D4
-(14)D7 <-> D3
-(15)LED <-> +5V ou GND
-(16)LED <-> +5V ou GND
+ * Comandos de controle da USR (Unidade Sensoriamento Remoto)
+ * 1 => Inicia leitura de dados com graficos offline (modo CSV)
+ * 2 => Para leitura de dados no modo CSV
+ * 3 => Deleta ultima leitura no modo CSV
+ * 4 => Inicia leitura de dados com grafico online (modo HTTP)
+ * 5 => Para leitura de dados no modo HTTP
+ * 9 => Reinicia USR
 --------------------------------
 Barometro: GY-65
+I2C address is 0x77
+VCC <-> +3.3V
 SDA <-> SDA
 SCL <-> SCL
-VCC <-> +3.3V
+XCLR <->
+EOC <-> 
 GND <-> GND
+--------------------------------
+Vibracao: GY-521
+VCC <-> 
+GND <->
+SCL <->
+SDA <->
+XDA <->
+XCL <->
+AD0 <-> +3,3V I2C address is 0x69 | GND I2C address is 0x68
+INT <->
 --------------------------------
 Termopar: TPA
 GND <-> GND
 GND <-> GND
-D8 <-> D2
+A3 <-> D8
 SDO <-> 12
 SCK <-> 13
 5V <-> +5V
 --------------------------------
-Amperimetro: AMP
+Amperimetro: AMP-AC
 GND <-> GND
 VCC <-> +5V
 OUT <-> A0
 --------------------------------
-Voltimetro: VLT
+Voltimetro: VLT-AC
 GND <-> GND
 VCC <-> +5V
 OUT <-> A1
 --------------------------------
-Rotacao: ROT
+Amperimetro: AMP-DC
 GND <-> GND
 VCC <-> +5V
 OUT <-> A2
 --------------------------------
+Voltimetro: VLT-DC
+GND <-> GND
+VCC <-> +5V
+OUT <-> A3
 --------------------------------
-SCL GY-65
-SDA GY-65
+Rotacao: ROT
+GND <-> GND
+VCC <-> +5V
+OUT <-> A4
+--------------------------------
+--------------------------------
+SCL GY-65 (I2C)
+SDA GY-65 (I2C)
 
-D13 TPA
-D12 TPA
+D13 TPA (SPI-SCK)
+D12 TPA (SPI-SDO)
 D11~
 D10~
 D9~
-D8 LCD
-D7 LCD
-D6~ LCD
-D5~ LCD
-D4 LCD
-D3~ LCD
+D8
+
+D7
+D6~
+D5~
+D4 
+D3~
 D2 TPA
 D1
 D0
 
-A0 AMP
-A1 VLT
-A2 ROT
-A3
-A4
+A0 AMP-AC
+A1 VLT-AC
+A2 AMP-DC
+A3 VLT-DC
+A4 ROT
 A5
 */
 
@@ -82,9 +95,14 @@ A5
 #include "Ethernet.h"
 #include "Nanoshield_Thermocouple.h"
 
-
-struct dadosCSR {       
+//..................................VARIABLES.............................
+struct dadosUSR {       
     char msg[50];
+    int voltAC;
+    int voltDC;
+    int ampAC;
+    int ampDC;
+    int rot;
     int tempCSR;
     int tempTPAint;
     int tempTPAext;
@@ -95,7 +113,7 @@ struct dadosCSR {
 }; 
 
 //variável global que contém todos os elementos da estrutura
-  struct dadosCSR dadosSensores;  //tal variável possui tamanho de 116 bytes
+  struct dadosUSR dadosSensores;
 
 Nanoshield_Thermocouple thermocouple;
 
@@ -103,8 +121,7 @@ Nanoshield_Thermocouple thermocouple;
 //byte mac[] = { 0x98, 0x4F, 0xEE, 0x00, 0x25, 0x6F };
 byte mac[] = { 0x98, 0x4F, 0xEE, 0x01, 0x14, 0x8A };
 IPAddress ip(192, 168, 0, 101);
-
-IPAddress serverMySQL(192,168,1,38);  // numeric IP for MySQL server
+IPAddress serverMySQL(192,168,0,100);  // numeric IP for MySQL server
 
 EthernetClient client;
 EthernetServer server(10000);
@@ -120,7 +137,7 @@ boolean flagReadSensorsCSV = false;
 boolean flagReadSensorsHTTP = false;
 boolean flagCreateFile = false;
 
-//temperatura placa
+//temperatura placa galileo
 char scale[4];
 char raw[4];
 char offset[4];
@@ -162,30 +179,32 @@ MPU6050 accelgyro;
 // for a human.
 //#define OUTPUT_BINARY_ACCELGYRO
 
+//..................................END VARIABLES.............................
 
 //..................................MAIN.....................................
+//..................................SETUP.....................................
 void setup() {
 
-  // Inicia-se a comunicaço serial e aguarda uma resposta
-  Serial.begin(9600);
-
-  //setupPin();
-  setupRede();
-  //setupI2C();
-  //setupBarometro();
-  //setupTermopar();
+  Serial.begin(115200);
   
-
+  setupRede();
+  setupI2C();
+  setupBarometro();
+  setupTermopar();
+  
 }
-
-
+//..................................END SETUP.................................
+//..................................LOOP.....................................
 void loop() {
 
   client = server.available();
   
   verificarComandos(client);
-  
-  executarComandoRecebido();
+
+  if(runCommand){
+    runCommand = false;
+    executarComandoRecebido();
+  }
   
   if(flagReadSensorsCSV){
     delay(1000);
@@ -199,11 +218,12 @@ void loop() {
   
   delay(1000);
 }
-//....................................MAIN...................................
+//..................................END LOOP.....................................
+//..................................END MAIN...................................
 
 //.......................................SETUP........................................
 void setupTermopar(){
-  Serial.begin(9600);
+  
   Serial.println("-------------------------------");
   Serial.println(" Nanoshield Serial Thermometer");
   Serial.println("-------------------------------");
@@ -212,7 +232,7 @@ void setupTermopar(){
   // Initialize the thermocouple
   // The CS pin can be passed as a parameter if different than pin D8,
   //  e.g. thermocouple.begin(7)
-  thermocouple.begin();
+  thermocouple.begin(8);
 }
 
 void setupRede(){
@@ -244,7 +264,6 @@ void setupI2C(){
     // initialize serial communication
     // (38400 chosen because it works as well at 8MHz as it does at 16MHz, but
     // it's really up to you depending on your project)
-    Serial.begin(115200);
 
     // initialize device
     Serial.println("Initializing I2C devices...");
@@ -259,57 +278,54 @@ void setupBarometro() {
 
 }
 
-void setupMovimento() {
+void setupVibracao() {
   
     accelgyro.initialize();
 
     // verify connection
     Serial.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
 }
-//.....................................SETUP...........................................
+//.....................................END SETUP................................
 
-//..................................................
+//.....................................FUNCTIONS...............................
 void executarComandoRecebido(){
   
-  if(runCommand){
-  
-  runCommand = false;
-    
   Serial.print("Executando comando [");
   Serial.print(command);
   Serial.println("] enviado...");
   
     switch(command){
     
-    case '2':
+    case '1':
     flagReadSensorsCSV = true;
     flagCreateFile = true;
     client.stop();
     break;
     
-    case '3':
+    case '2':
     flagReadSensorsCSV = false;
     client.stop();
     break;
     
-    case '4':
+    case '3':
     system("rm /opt/weblabmotor/web/database/*.csv");
     client.stop();
     break;
 
-    case '5':
+    case '4':
     flagReadSensorsHTTP = true;
     client.stop();
     break;
 
-    case '6':
+    case '5':
     flagReadSensorsHTTP = false;
     client.stop();
     break;
     
     case '9':
-    resetExperimento();
+    Serial.println("Reiniciando experimento...");
     client.stop();
+    setup();
     break;
     
     default:
@@ -319,15 +335,15 @@ void executarComandoRecebido(){
     
     }
   
-  }
+  
 }
 
 void readSensorsCSV(){
   
   tempoAtual();
   temperaturaCSR();
-  //temperaturaTermopar();
-  //barometro();
+  temperaturaTermopar();
+  barometro();
   
   FILE * pFile;
   pFile = fopen ("/opt/weblabmotor/web/database/main.csv", "a+");
@@ -342,7 +358,7 @@ void readSensorsCSV(){
 
   sprintf (sensorBuffer,"%s,%d,%d,%d,%d,%d\n", dadosSensores.tempo, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempCSR); 
   
-  //Serial.print(sensorBuffer); 
+  Serial.print(sensorBuffer); 
   fwrite (sensorBuffer , sizeof(char), sizeof(sensorBuffer), pFile);
   fclose(pFile);
   
@@ -359,24 +375,23 @@ void readSensorsHTTP(){
  
   EthernetClient clientMySQL;
   
-  tempoAtual();
   temperaturaCSR();
-  //temperaturaTermopar();
-  //barometro();
+  temperaturaTermopar();
+  barometro();
   
     if (clientMySQL.connect(serverMySQL, 80)) {
    
-    Serial.println("connected");
+    Serial.println("database connected");
    
     // Make a HTTP request:
     char headerBuffer [87];
-    sprintf (headerBuffer,"GET /home/cgi-bin/python/mysql/database-insert.py?a0=%d;a1=%d;a2=%d;a3=%d;a4=%d;a5=%d HTTP/1.1",dadosSensores.tempo, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempCSR);
-    //Serial.println(headerBuffer);
+    sprintf (headerBuffer,"GET /home/cgi-bin/python/mysql/database-insert.py?a0=%d;a1=%d;a2=%d;a3=%d;a4=%d;a5=%d HTTP/1.1",dadosSensores.tempTPAint, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempCSR);
+    Serial.println(headerBuffer);
     clientMySQL.println(headerBuffer);
     clientMySQL.println("Host: 192.168.0.100");
     clientMySQL.println("Connection: close");
     clientMySQL.println();
-    Serial.println("disconnecting.");
+    Serial.println("database disconnecting.");
 
     //limpar dados remanescentes e fechar conexao
     memset(headerBuffer, 0, 87);
@@ -385,7 +400,7 @@ void readSensorsHTTP(){
   }
   else {
     // kf you didn't get a connection to the server:
-    Serial.println("connection failed");
+    Serial.println("database connection failed");
   }
   
   dadosSensores.tempTPAext = 0;
@@ -485,13 +500,6 @@ void temperaturaTermopar(){
   
 }
 
-void resetExperimento(){
-
-  Serial.println("Reiniciando experimento...");
-  setup();
-  
-}
-
 void barometro() {
     // request temperature
     barometer.setControl(BMP085_MODE_TEMPERATURE);
@@ -584,3 +592,4 @@ void temperaturaCSR(){
   dadosSensores.tempCSR = temp;
  
 }
+//.....................................END FUNCTIONS...............................
