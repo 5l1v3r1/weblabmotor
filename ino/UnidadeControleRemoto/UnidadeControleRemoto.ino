@@ -163,7 +163,7 @@ void setupPin() {
 //.....................................FUNCTIONS...............................
 void verificarComandos(EthernetClient client) {
 
-  Serial.println("Waiting data...");
+  //Serial.println("Waiting data...");
 
   if (client) {
 
