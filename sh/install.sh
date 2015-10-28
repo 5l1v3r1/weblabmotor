@@ -30,8 +30,15 @@ case ${option} in
         apt-get update
         apt-get install php5 apache2 mysql-server php5-mysql phpmyadmin
       ;;
+    -s) DIR="${2}" 
+      echo "instalando servidor de experimentos"
+      cp /opt/weblabmotor/tools/server/csrserver.sh /etc/init.d/csrserver.sh
+      chmod -R 755 /etc/init.d/csrserver.sh
+      chmod +x /etc/init.d/csrserver.sh
+      update-rc.d csrserver.sh defaults
+    ;;
    *)  
-      echo "`basename ${0}`:usage: [-y yocto] | [-d debianLike] [-i installDebianLike] [-r installRpi]" 
+      echo "`basename ${0}`:usage: [-y yocto] | [-d debianLike] [-i installDebianLike] [-r installRpi] [-s installExperimentServer]" 
       exit 1 # Command to come out of the program with status 1
       ;; 
-esac 
+esac
