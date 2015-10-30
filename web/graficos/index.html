@@ -52,7 +52,7 @@
 	            //min: 0,
 	            //max: 50,
 	            title: {
-	                text: "DADO W"
+	                text: "DADOS"
 	            },
 	            //reversed: !0,
 	            plotLines: [{
@@ -64,7 +64,7 @@
 	           // max: 10,
 	           min: 0,
 	            title: {
-	                text: "DADO Z"
+	                text: "DADOS"
 	            },
 	            plotLines: [{
 	                value: 0,
@@ -80,17 +80,17 @@
 		$.getJSON("/home/cgi-bin/php/mysql/database-reader.php", function(json) {
                     options.xAxis.categories = json[0]['data']; //xAxis: {categories: []}
                     options.series[0] = json[1];
-                    options.series[0].name = "Ref. Termopar";
+                    options.series[0].name = "Ref. Termopar (°C)";
                     options.series[1] = json[2];
-                    options.series[1].name = "Escapamento";
+                    options.series[1].name = "Escapamento (°C)";
                     options.series[2] = json[3];
-                    options.series[2].name = "Admissao";
+                    options.series[2].name = "Admissao (°C)";
                     options.series[3] = json[4];
-                    options.series[3].name = "Altitude";
+                    options.series[3].name = "Altitude (m)";
                     options.series[4] = json[5];
-                    options.series[4].name = "Barometro";
+                    options.series[4].name = "Barometro (mmHg)";
                     options.series[5] = json[6];
-                    options.series[5].name = "CPU-USR";
+                    options.series[5].name = "CPU-USR (°C)";
                     chart = new Highcharts.Chart(options);
          });
 	
