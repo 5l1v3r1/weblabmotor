@@ -3,9 +3,11 @@
   try
   {
     //open the database
-	$db = new PDO('mysql:host=localhost;dbname=csr','root','root');
+	$db = new PDO('mysql:host=localhost;dbname=cer','root','root');
+  $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    $result = $db->query('SELECT * FROM sensoresTemporario');
+
+    $result = $db->query('SELECT * FROM usrTemporario');
 
     //nome para os dados nos graficos
     $tempo['name'] = 'TEMPO';
