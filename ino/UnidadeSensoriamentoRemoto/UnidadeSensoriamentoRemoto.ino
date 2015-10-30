@@ -385,7 +385,7 @@ void readSensorsHTTP(){
    
     // Make a HTTP request:
     char headerBuffer [87];
-    sprintf (headerBuffer,"GET /home/cgi-bin/python/mysql/database-insert.py?a0=%d;a1=%d;a2=%d;a3=%d;a4=%d;a5=%d HTTP/1.1",dadosSensores.tempTPAint, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempCSR);
+    sprintf (headerBuffer,"GET /home/cgi-bin/php/mysql/database-insert.php?a0=%d&a1=%d&a2=%d&a3=%d&a4=%d&a5=%d HTTP/1.1",dadosSensores.tempTPAint, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempCSR);
     Serial.println(headerBuffer);
     clientMySQL.println(headerBuffer);
     clientMySQL.println("Host: 192.168.0.100");
