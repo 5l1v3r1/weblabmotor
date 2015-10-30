@@ -54,7 +54,7 @@
 	            title: {
 	                text: "DADO W"
 	            },
-	            reversed: !0,
+	            //reversed: !0,
 	            plotLines: [{
 	                value: 0,
 	                width: 1,
@@ -62,7 +62,7 @@
 	            }],
 	        	}, { //secondary y axis 
 	           // max: 10,
-	           // min: 0,
+	           min: 0,
 	            title: {
 	                text: "DADO Z"
 	            },
@@ -72,7 +72,7 @@
 	                color: "#808080"
 	            }],
 	            opposite: !0,
-	            reversed: !1
+	            //reversed: !0
 	        }],
 	        series: []
 	    };
@@ -80,11 +80,17 @@
 		$.getJSON("/home/cgi-bin/php/mysql/database-reader.php", function(json) {
                     options.xAxis.categories = json[0]['data']; //xAxis: {categories: []}
                     options.series[0] = json[1];
+                    options.series[0].name = "Ref. Termopar";
                     options.series[1] = json[2];
+                    options.series[1].name = "Escapamento";
                     options.series[2] = json[3];
+                    options.series[2].name = "Admissao";
                     options.series[3] = json[4];
+                    options.series[3].name = "Altitude";
                     options.series[4] = json[5];
+                    options.series[4].name = "Barometro";
                     options.series[5] = json[6];
+                    options.series[5].name = "CPU-USR";
                     chart = new Highcharts.Chart(options);
          });
 	

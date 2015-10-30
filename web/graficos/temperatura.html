@@ -52,7 +52,7 @@
               //min: 0,
               //max: 50,
               title: {
-                  text: "DADO W"
+                  text: "°C"
               },
               reversed: !0,
               plotLines: [{
@@ -60,27 +60,16 @@
                   width: 1,
                   color: "#808080"
               }],
-            }, { //secondary y axis 
-             // max: 10,
-             // min: 0,
-              title: {
-                  text: "DADO Z"
-              },
-              plotLines: [{
-                  value: 0,
-                  width: 1,
-                  color: "#808080"
-              }],
-              opposite: !0,
-              reversed: !1
-          }],
+            }],
           series: []
       };
 
     $.getJSON("/home/cgi-bin/php/mysql/database-reader.php", function(json) {
                     options.xAxis.categories = json[0]['data']; //xAxis: {categories: []}
                     options.series[0] = json[1];
+                    options.series[0].name = "Ref. Termopar";
                     options.series[1] = json[2];
+                    options.series[1].name = "Escapamento";
                     chart = new Highcharts.Chart(options);
          });
   
