@@ -9,11 +9,25 @@
     
   try
   {
+    
     //open the database
-  	$db = new PDO('mysql:host=localhost;dbname=cer','root','root');
+    $conn = new PDO('mysql:host=localhost;dbname=cer','root','root');
 
-    $db->exec("INSERT INTO usrTemporario (data, a0, a1, a2, a3, a4, a5)
-    VALUES (current_timestamp(),'$a0', '$a1', '$a2', '$a3', '$a4' , '$a5')");
+    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    //$db->exec("INSERT INTO usr (data, a0, a1, a2, a3, a4, a5)
+    //VALUES (current_timestamp(),'$a0', '$a1', '$a2', '$a3', '$a4' , '$a5')");
+
+    $stmt = $conn->prepare("INSERT INTO usrTemporario ( a0, a1, a2, a3, a4, a5)
+    VALUES (:a0, :a1, :a2, :a3, :a4, :a5)");
+    $stmt->bindParam(':a0', $a0);
+    $stmt->bindParam(':a1', $a1);
+    $stmt->bindParam(':a2', $a2);
+    $stmt->bindParam(':a3', $a3);
+    $stmt->bindParam(':a4', $a4);
+    $stmt->bindParam(':a5', $a5);
+
+    $stmt->execute();
 
     // close the database connection
     $db = NULL;
