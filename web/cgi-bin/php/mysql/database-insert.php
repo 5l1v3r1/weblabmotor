@@ -10,9 +10,9 @@
   try
   {
     //open the database
-  	$db = new PDO('mysql:host=localhost;dbname=sensores','root','root');
+  	$db = new PDO('mysql:host=localhost;dbname=csr','root','root');
 
-    $db->exec("INSERT INTO dados (data, a0, a1, a2, a3, a4, a5)
+    $db->exec("INSERT INTO usrTemporario (data, a0, a1, a2, a3, a4, a5)
     VALUES (current_timestamp(),'$a0', '$a1', '$a2', '$a3', '$a4' , '$a5')");
 
     // close the database connection
