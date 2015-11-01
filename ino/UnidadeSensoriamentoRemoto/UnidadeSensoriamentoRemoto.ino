@@ -37,12 +37,12 @@ SCK <-> 13
 Amperimetro: AMP-AC
 GND <-> GND
 VCC <-> +5V
-OUT <-> A0
+OUT <-> A1
 --------------------------------
 Voltimetro: VLT-AC
 GND <-> GND
 VCC <-> +5V
-OUT <-> A1
+OUT <-> A0
 --------------------------------
 Amperimetro: AMP-DC
 GND <-> GND
@@ -100,10 +100,10 @@ struct dadosUSR {
     char msg[50];
     int voltAC;
     int voltDC;
-    int ampAC;
+    float ampAC;
     int ampDC;
     int rot;
-    int tempCSR;
+    int tempUSR;
     int tempTPAint;
     int tempTPAext;
     int tempBAR;
@@ -178,6 +178,14 @@ MPU6050 accelgyro;
 // without compression or data loss), and easy to parse, but impossible to read
 // for a human.
 //#define OUTPUT_BINARY_ACCELGYRO
+
+const int sensorIn = A1;
+int mVperAmp = 66; // use 100 for 20A Module and 66 for 30A Module
+
+
+double Voltage = 0;
+double VRMS = 0;
+double AmpsRMS = 0;
 
 //..................................END VARIABLES.............................
 
@@ -341,7 +349,7 @@ void executarComandoRecebido(){
 void readSensorsCSV(){
   
   tempoAtual();
-  temperaturaCSR();
+  temperaturaUSR();
   temperaturaTermopar();
   barometro();
   
@@ -356,7 +364,7 @@ void readSensorsCSV(){
     flagCreateFile = false;
   }
 
-  sprintf (sensorBuffer,"%s,%d,%d,%d,%d,%d\n", dadosSensores.tempo, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempCSR); 
+  sprintf (sensorBuffer,"%s,%d,%d,%d,%d,%d\n", dadosSensores.tempo, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempUSR); 
   
   Serial.print(sensorBuffer); 
   fwrite (sensorBuffer , sizeof(char), sizeof(sensorBuffer), pFile);
@@ -375,17 +383,40 @@ void readSensorsHTTP(){
  
   EthernetClient clientMySQL;
   
-  temperaturaCSR();
+  temperaturaUSR();
   temperaturaTermopar();
   barometro();
-  
+  correnteAC();
+
+ Serial.print("REF. °C: ");
+ Serial.print(dadosSensores.tempTPAint);
+ Serial.print(", ");
+ Serial.print("ES °C: ");
+ Serial.print(dadosSensores.tempTPAext);
+ Serial.print(", ");
+ Serial.print("AD °C: ");
+ Serial.print(dadosSensores.tempBAR);
+ Serial.println(", ");
+ Serial.print("AD mmHg: ");
+ Serial.print(dadosSensores.presBAR);
+ Serial.print(", ");
+ Serial.print("ALT.: ");
+ Serial.print(dadosSensores.altBAR);
+ Serial.print(", ");
+ Serial.print("CPU: ");
+ Serial.println(dadosSensores.tempUSR);
+ Serial.print(", ");
+ Serial.print("IAC: ");
+ Serial.println(dadosSensores.tempUSR);
+
+ 
     if (clientMySQL.connect(serverMySQL, 80)) {
    
     Serial.println("database connected");
    
     // Make a HTTP request:
     char headerBuffer [87];
-    sprintf (headerBuffer,"GET /home/cgi-bin/php/mysql/database-insert.php?a0=%d&a1=%d&a2=%d&a3=%d&a4=%d&a5=%d HTTP/1.1",dadosSensores.tempTPAint, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempCSR);
+    sprintf (headerBuffer,"GET /home/cgi-bin/php/mysql/database-insert.php?a0=%d&a1=%d&a2=%d&a3=%d&a4=%d&a5=%d HTTP/1.1",dadosSensores.tempTPAint, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempUSR);
     Serial.println(headerBuffer);
     clientMySQL.println(headerBuffer);
     clientMySQL.println("Host: 192.168.0.100");
@@ -565,7 +596,7 @@ void movimento() {
 }
 
 
-void temperaturaCSR(){
+void temperaturaUSR(){
   
   FILE *fp_raw;
   fp_raw = fopen("/sys/bus/iio/devices/iio:device0/in_temp0_raw", "r");     //read the values from scale, raw and offset files.
@@ -589,7 +620,50 @@ void temperaturaCSR(){
   int temp = (raw_i + offset_i) * scale_i;  //Calculate temperature in milli-degrees celcius
   temp /= 1000;                         //divide by 1000 to convert to degrees celcius
 
-  dadosSensores.tempCSR = temp;
+  dadosSensores.tempUSR = temp;
  
 }
+
+void correnteAC(){
+    
+ Voltage = getVPP();
+ VRMS = (Voltage/2.0) *0.707; 
+ AmpsRMS = (VRMS * 1000)/mVperAmp;
+ dadosSensores.ampAC = AmpsRMS;
+ //Serial.print(AmpsRMS);
+ //Serial.println(" Amps RMS");
+
+}
+
+float getVPP()
+{
+  float result;
+  
+  int readValue;             //value read from the sensor
+  int maxValue = 0;          // store max value here
+  int minValue = 1023;          // store min value here
+  
+   uint32_t start_time = millis();
+   while((millis()-start_time) < 1000) //sample for 1 Sec
+   {
+       readValue = analogRead(sensorIn);
+       // see if you have a new maxValue
+       if (readValue > maxValue) 
+       {
+           /*record the maximum sensor value*/
+           maxValue = readValue;
+       }
+       if (readValue < minValue) 
+       {
+           /*record the maximum sensor value*/
+           minValue = readValue;
+       }
+   }
+   
+   // Subtract min from max
+   result = ((maxValue - minValue) * 5.0)/1023.0;
+      
+   return result;
+ }
+
 //.....................................END FUNCTIONS...............................
