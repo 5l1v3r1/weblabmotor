@@ -45,7 +45,6 @@ EthernetServer server(10000);
 
 //Pino de controle do motor
 int motor = 2;
-int statusMotor;
 
 //Controle da carga
 int carga_25 = 4;
@@ -115,16 +114,17 @@ void loop() {
 
 //.......................................SETUP........................................
 void setupPID() {
-  SetSampleTime(100);
-  SetOutputLimits(0, 180);
-  SetControllerDirection(DIRECT);
-  SetTunings(1, 1, 1); //kp,ki,kd
-  Setpoint = 300;
+  SetSampleTime(250);
+  SetOutputLimits(35, 105);
+  SetControllerDirection(REVERSE);
+  SetTunings(1, 0, 0); //kp,ki,kd
+  Setpoint = 600;
   SetMode(AUTOMATIC);
 }
 
 void setupServo() {
   myservo.attach(PIN_OUTPUT);
+  myservo.write(105);
 }
 
 void setupRede() {
@@ -220,17 +220,25 @@ void executarComandoRecebido() {
     }
 
   } else if (command.substring(0, x) == "motor") {
-    Serial.print("controlando motor");
-    controlarMotor();
+
+    if ( command.substring(x + 1, t) == "on") {
+      Serial.println("ativando MOTOR");
+      ligarMotor();
+    } else if (command.substring(x + 1, t) == "off") {
+      Serial.println("desativando MOTOR");
+      desligarMotor();
+    }
+    
     resetComando();
 
   } else if (command.substring(0, x) == "k") {
     Serial.println(command.substring(x + 1, 5)); //kp
+    String kp = command.substring(x + 1, 5);
     //Serial.println(command.substring(5, 6)); //ki
     //Serial.println(command.substring(9, 10)); //kd
     //SetSampleTime(100);
     //SetOutputLimits(0,180);
-    //SetTunings(2,4,1);//kp,ki,kd
+    SetTunings(kp.toInt(),0,0);//kp,ki,kd
     //Setpoint = 300;
     resetComando();
 
@@ -389,15 +397,22 @@ void SetControllerDirection(int Direction)
   controllerDirection = Direction;
 }
 
-void controlarMotor() {
+void ligarMotor() {
 
-  statusMotor = digitalRead(motor);
+  Serial.println("Ligando motor...");
+  
+  myservo.write(105);
+  digitalWrite(motor, HIGH);
+  delay(1500);
+  digitalWrite(motor, LOW);  
 
-  if (statusMotor == 1) {
-    Serial.println("Motor ligado, desligando motor...");
-    digitalWrite(motor, LOW);
-  } else {
-    Serial.println("Motor desligado, Ligando motor...");
-    digitalWrite(motor, HIGH);
-  }
+}
+
+void desligarMotor() {
+
+  Serial.println("Desligando motor...");
+  
+  runPID = false ;
+  myservo.write(35);
+  
 }
