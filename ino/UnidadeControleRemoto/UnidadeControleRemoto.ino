@@ -21,8 +21,8 @@ D2  MOTOR (ON/OFF)
 D1
 D0
 
-A0 VLT-AC (I2C)
-A1        (I2C)
+A0 ROT
+A1        (OPEN)
 A2
 A3
 A4
