@@ -98,11 +98,9 @@ A5
 //..................................VARIABLES.............................
 struct dadosUSR {       
     char msg[50];
-    int voltAC;
-    int voltDC;
+    float voltAC;
     float ampAC;
-    int ampDC;
-    int rot;
+    float rotacao;
     int tempUSR;
     int tempTPAint;
     int tempTPAext;
@@ -187,6 +185,15 @@ double Voltage = 0;
 double VRMS = 0;
 double AmpsRMS = 0;
 
+
+ volatile byte half_revolutions;
+
+ float rpm;
+
+ unsigned long timeold;
+
+ boolean startInterrupt;
+
 //..................................END VARIABLES.............................
 
 //..................................MAIN.....................................
@@ -199,7 +206,7 @@ void setup() {
   setupI2C();
   setupBarometro();
   setupTermopar();
-  
+  setupRotacao();
 }
 //..................................END SETUP.................................
 //..................................LOOP.....................................
@@ -293,6 +300,15 @@ void setupVibracao() {
     // verify connection
     Serial.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
 }
+
+ void setupRotacao()
+ {
+   half_revolutions = 0;
+   rpm = 0;
+   timeold = 0;
+   startInterrupt = true;
+ }
+
 //.....................................END SETUP................................
 
 //.....................................FUNCTIONS...............................
@@ -382,41 +398,64 @@ void readSensorsCSV(){
 void readSensorsHTTP(){
  
   EthernetClient clientMySQL;
+
+  dadosSensores.tempTPAext = 0;
+  dadosSensores.tempTPAint = 0;
+  dadosSensores.tempBAR = 0;
+  dadosSensores.presBAR = 0;
+  dadosSensores.altBAR = 0;
+  dadosSensores.tempUSR = 0;
+  dadosSensores.ampAC = 0;
+  dadosSensores.voltAC = 0;
+  dadosSensores.rotacao = 0;
   
   temperaturaUSR();
   temperaturaTermopar();
   barometro();
   correnteAC();
+  rotacao();
 
- Serial.print("REF. °C: ");
- Serial.print(dadosSensores.tempTPAint);
- Serial.print(", ");
- Serial.print("ES °C: ");
- Serial.print(dadosSensores.tempTPAext);
- Serial.print(", ");
- Serial.print("AD °C: ");
- Serial.print(dadosSensores.tempBAR);
- Serial.println(", ");
- Serial.print("AD mmHg: ");
- Serial.print(dadosSensores.presBAR);
- Serial.print(", ");
- Serial.print("ALT.: ");
- Serial.print(dadosSensores.altBAR);
- Serial.print(", ");
- Serial.print("CPU: ");
- Serial.println(dadosSensores.tempUSR);
- Serial.print(", ");
- Serial.print("IAC: ");
- Serial.println(dadosSensores.tempUSR);
+// Serial.print("REF. C: ");
+// Serial.print(dadosSensores.tempTPAint);
+// Serial.print(", ");
+// Serial.print("ES C: ");
+// Serial.print(dadosSensores.tempTPAext);
+// Serial.print(", ");
+// Serial.print("AD C: ");
+// Serial.print(dadosSensores.tempBAR);
+// Serial.println(", ");
+// Serial.print("AD mmHg: ");
+// Serial.print(dadosSensores.presBAR);
+// Serial.print(", ");
+// Serial.print("ALT.: ");
+// Serial.print(dadosSensores.altBAR);
+// Serial.print(", ");
+// Serial.print("CPU: ");
+// Serial.print(dadosSensores.tempUSR);
+// Serial.print(", ");
+// Serial.print("IAC: ");
+// Serial.print(dadosSensores.ampAC);
+// Serial.print("VAC: ");
+// Serial.print(dadosSensores.voltAC);
+// Serial.print(", ");
+// Serial.print("RPM: ");
+// Serial.println(dadosSensores.rotacao);
 
  
     if (clientMySQL.connect(serverMySQL, 80)) {
    
     Serial.println("database connected");
    
-    // Make a HTTP request:
     char headerBuffer [87];
-    sprintf (headerBuffer,"GET /home/cgi-bin/php/mysql/database-insert.php?a0=%d&a1=%d&a2=%d&a3=%d&a4=%d&a5=%d HTTP/1.1",dadosSensores.tempTPAint, dadosSensores.tempTPAext, dadosSensores.tempBAR, dadosSensores.presBAR, dadosSensores.altBAR, dadosSensores.tempUSR);
+    sprintf (headerBuffer,"GET /home/cgi-bin/php/mysql/database-insert.php?a0=%d&a1=%d&a2=%d&a3=%d&a4=%d&a5=%d&a6=%f HTTP/1.1",
+    dadosSensores.tempTPAint,
+    dadosSensores.tempTPAext,
+    dadosSensores.tempBAR,
+    dadosSensores.presBAR,
+    dadosSensores.altBAR,
+    dadosSensores.tempUSR,
+    dadosSensores.ampAC);
+   
     Serial.println(headerBuffer);
     clientMySQL.println(headerBuffer);
     clientMySQL.println("Host: 192.168.0.100");
@@ -434,11 +473,6 @@ void readSensorsHTTP(){
     Serial.println("database connection failed");
   }
   
-  dadosSensores.tempTPAext = 0;
-  dadosSensores.tempTPAint = 0;
-  dadosSensores.tempBAR = 0;
-  dadosSensores.presBAR = 0;
-  dadosSensores.altBAR = 0;  
 }
 
 void tempoAtual(){
@@ -664,6 +698,47 @@ float getVPP()
    result = ((maxValue - minValue) * 5.0)/1023.0;
       
    return result;
+ }
+ 
+ void rotacao(){
+  
+   uint32_t start_time = millis();
+   
+   startInterrupt = true;
+
+    while((millis()-start_time) < 2000){
+    calculaRotacao();  
+
+    if(startInterrupt){
+      attachInterrupt(3, rpm_fun, CHANGE);
+      startInterrupt = false;
+    }
+    
+  }
+  
+}
+
+void calculaRotacao(){
+     
+     if (half_revolutions >= 12) {
+
+     float a = (millis() - timeold)/1000.0;
+     float b = (a/half_revolutions);
+     float c = 2.0*b;
+     float d = 1.0/c;
+     rpm = 60.0*d;
+     timeold = millis();
+     
+     half_revolutions = 0;
+     //Serial.println(rpm);
+     dadosSensores.rotacao = rpm;
+     
+   }
+}
+
+ void rpm_fun()
+ {
+   half_revolutions++;
  }
 
 //.....................................END FUNCTIONS...............................
