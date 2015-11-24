@@ -17,6 +17,10 @@
     $a3['name'] = 'A3';
     $a4['name'] = 'A4';
     $a5['name'] = 'A5';
+    $a6['name'] = 'A6';
+    $a7['name'] = 'A7';
+    $a8['name'] = 'A8';
+    $a9['name'] = 'A9';
 
     foreach($result as $row)
     {
@@ -27,6 +31,10 @@
       $a3['data'][] = $row['a3'];
       $a4['data'][] = $row['a4'];
       $a5['data'][] = $row['a5'];
+      $a6['data'][] = $row['a6'];
+      $a7['data'][] = $row['a7'];
+      $a8['data'][] = $row['a8'];
+      $a9['data'][] = $row['a9'];
 
     }
 
@@ -38,6 +46,10 @@
     array_push($rslt, $a3);
     array_push($rslt, $a4);
     array_push($rslt, $a5);
+    array_push($rslt, $a6);
+    array_push($rslt, $a7);
+    array_push($rslt, $a8);
+    array_push($rslt, $a9);
 
     print json_encode($rslt, JSON_NUMERIC_CHECK);
 
