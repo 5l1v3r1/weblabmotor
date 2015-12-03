@@ -22,7 +22,7 @@ D1
 D0
 
 A0 ROT
-A1        (OPEN)
+A1        (I2C)
 A2
 A3
 A4
@@ -85,7 +85,7 @@ boolean runPID = false;
 //..................................SETUP.....................................
 void setup() {
 
-  Serial.begin(115200);
+  Serial.begin(9600);
   setupRede();
   setupPID();
   setupServo();
@@ -124,7 +124,7 @@ void setupPID() {
 
 void setupServo() {
   myservo.attach(PIN_OUTPUT);
-  myservo.write(105);
+  myservo.write(170);
 }
 
 void setupRede() {
@@ -152,10 +152,10 @@ void setupPin() {
   pinMode(carga_75, OUTPUT);
   pinMode(carga_100, OUTPUT);
   digitalWrite(motor, LOW);
-  digitalWrite(carga_25, LOW);
-  digitalWrite(carga_50, LOW);
-  digitalWrite(carga_75, LOW);
-  digitalWrite(carga_100, LOW);
+  digitalWrite(carga_25, HIGH);
+  digitalWrite(carga_50, HIGH);
+  digitalWrite(carga_75, HIGH);
+  digitalWrite(carga_100, HIGH);
 
 }
 //.....................................END SETUP................................
@@ -231,41 +231,62 @@ void executarComandoRecebido() {
     
     resetComando();
 
-  } else if (command.substring(0, x) == "k") {
-    Serial.println(command.substring(x + 1, 5)); //kp
-    String kp = command.substring(x + 1, 5);
-    //Serial.println(command.substring(5, 6)); //ki
-    //Serial.println(command.substring(9, 10)); //kd
-    //SetSampleTime(100);
-    //SetOutputLimits(0,180);
+  } else if (command.substring(0, x) == "kp") {
+    //Serial.println(command.substring(x + 1, t)); //kp
+    String kp = command.substring(x + t, 5);
     SetTunings(kp.toInt(),0,0);//kp,ki,kd
-    //Setpoint = 300;
+    resetComando();
+  
+  } else if (command.substring(0, x) == "ki") {
+    //Serial.println(command.substring(x + 1, t)); //ki
+    String ki = command.substring(x + t, 5);
+    SetTunings(0,ki.toInt(),0);//kp,ki,kd
     resetComando();
 
+  } else if (command.substring(0, x) == "kd") {
+    //Serial.println(command.substring(x + 1, t)); //kd
+    String kd = command.substring(x + t, 5);
+    SetTunings(0,0,kd.toInt());//kp,ki,kd
+    resetComando();
+  
+  } else if (command.substring(0, x) == "acel") {
+    //Serial.println(command.substring(x + 1, t)); //kd
+    String acel = command.substring(x + t, 5);
+    int a = acel.toInt();
+    a = map(a,0,100,170,120);
+    myservo.write(a);
+    resetComando();
+  
   } else if (command.substring(0, x) == "carga") {
 
     if ( command.substring(x + 1, t) == "0") {
       Serial.println("desativar carga...");
+      digitalWrite(carga_25, HIGH);
+      digitalWrite(carga_50, HIGH);
+      digitalWrite(carga_75, HIGH);
+      digitalWrite(carga_100, HIGH);
+      resetComando();
+    } else if (command.substring(x + 1, t) == "25") {
+      Serial.println("25% de carga...");
+      digitalWrite(carga_25, LOW);
+      resetComando();
+    } else if (command.substring(x + 1, t) == "50") {
+      Serial.println("50% de carga...");
+      digitalWrite(carga_25, LOW);
+      digitalWrite(carga_50, LOW);
+      resetComando();
+    } else if (command.substring(x + 1, t) == "75") {
+      Serial.println("75% de carga...");
+      digitalWrite(carga_25, LOW);
+      digitalWrite(carga_50, LOW);
+      digitalWrite(carga_75, LOW);
+      resetComando();
+    } else if (command.substring(x + 1, t) == "100") {
+      Serial.println("100% de carga...");
       digitalWrite(carga_25, LOW);
       digitalWrite(carga_50, LOW);
       digitalWrite(carga_75, LOW);
       digitalWrite(carga_100, LOW);
-      resetComando();
-    } else if (command.substring(x + 1, t) == "25") {
-      Serial.println("25% de carga...");
-      digitalWrite(carga_25, HIGH);
-      resetComando();
-    } else if (command.substring(x + 1, t) == "50") {
-      Serial.println("50% de carga...");
-      digitalWrite(carga_50, HIGH);
-      resetComando();
-    } else if (command.substring(x + 1, t) == "75") {
-      Serial.println("75% de carga...");
-      digitalWrite(carga_75, HIGH);
-      resetComando();
-    } else if (command.substring(x + 1, t) == "100") {
-      Serial.println("100% de carga...");
-      digitalWrite(carga_100, HIGH);
       resetComando();
     }
 
@@ -401,18 +422,28 @@ void ligarMotor() {
 
   Serial.println("Ligando motor...");
   
-  myservo.write(105);
+  myservo.write(170);
   digitalWrite(motor, HIGH);
-  delay(1500);
-  digitalWrite(motor, LOW);  
-
+  delay(1000);
+  myservo.write(165);
+  delay(1000);
+  myservo.write(160);
+  delay(1000);
+  digitalWrite(motor, LOW);
+  myservo.write(155);
+  //delay(1000);
+  //myservo.write(150);
+  //delay(2000);
+  //myservo.write(130);
+ 
 }
 
 void desligarMotor() {
 
+
   Serial.println("Desligando motor...");
   
   runPID = false ;
-  myservo.write(35);
+  myservo.write(180);
   
 }
