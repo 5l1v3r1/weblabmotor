@@ -80,6 +80,10 @@ bool inAuto;
 //Flags
 boolean runCommand = false;
 boolean runPID = false;
+boolean flagCarburador = false;
+boolean flagTempoCarburador = true;
+
+unsigned long tempoCarburador;
 
 //..................................MAIN.....................................
 //..................................SETUP.....................................
@@ -97,6 +101,10 @@ void loop() {
 
   client = server.available();
 
+  if(flagCarburador){
+    carburador();  
+  }
+  
   verificarComandos(client);
 
   if (runCommand) {
@@ -224,9 +232,11 @@ void executarComandoRecebido() {
     if ( command.substring(x + 1, t) == "on") {
       Serial.println("ativando MOTOR");
       ligarMotor();
+      flagCarburador = true;
     } else if (command.substring(x + 1, t) == "off") {
       Serial.println("desativando MOTOR");
       desligarMotor();
+      flagCarburador = false;
     }
     
     resetComando();
@@ -429,13 +439,30 @@ void ligarMotor() {
   delay(1000);
   myservo.write(160);
   delay(1000);
-  digitalWrite(motor, LOW);
-  myservo.write(155);
+  //digitalWrite(motor, LOW);
+  //myservo.write(155);
   //delay(1000);
   //myservo.write(150);
   //delay(2000);
   //myservo.write(130);
  
+}
+
+void carburador(){
+
+  if(flagTempoCarburador){
+    tempoCarburador = millis();
+    flagTempoCarburador = false;
+  }
+  
+  if((millis()-tempoCarburador) > 6000){
+    myservo.write(160);
+    myservo.write(165);
+    myservo.write(160);
+    tempoCarburador = 0;
+    flagTempoCarburador = true;
+  }
+  
 }
 
 void desligarMotor() {
