@@ -181,7 +181,6 @@ MPU6050 accelgyro;
 const int sensorIn = 1;
 int mVperAmp = 66; // use 100 for 20A Module and 66 for 30A Module
 
-
 double Voltage = 0;
 double VRMS = 0;
 double AmpsRMS = 0;
@@ -307,7 +306,7 @@ void setupVibracao() {
 void setupRotacao()
 {
   half_revolutions = 0;
-  rpm = 0;
+  rpm = 0.0;
   timeold = 0;
   startInterrupt = true;
 }
@@ -408,7 +407,7 @@ void readSensorsHTTP(){
   correnteAC();
   voltimetroAC();
   rotacao();
-  
+
   //char sensorBuffer [100];
   //sprintf (sensorBuffer,"a0=%d&a1=%d&a2=%d&a3=%d&a4=%d&a5=%d&a6=%d&a7=%f&a8=%f",
   //dadosSensores.tempTPAint,
@@ -420,11 +419,11 @@ void readSensorsHTTP(){
   //dadosSensores.rotacao,
   //dadosSensores.voltAC,
   //dadosSensores.ampAC);
-  
+
   //Serial.println(sensorBuffer);
-  
+
   //memset(sensorBuffer, 0, 100);
-  
+
   if (clientMySQL.connect(serverMySQL, 80)) {
 
     Serial.println("database connected");
@@ -449,7 +448,8 @@ void readSensorsHTTP(){
     memset(headerBuffer, 0, 87);
     clientMySQL.flush();
     clientMySQL.stop();
-  } else {
+  } 
+  else {
     Serial.println("database connection failed");
   }
 
@@ -474,10 +474,11 @@ void readSensorsHTTP(){
     memset(headerBuffer, 0, 87);
     clientMySQL.flush();
     clientMySQL.stop();
-  } else {
+  } 
+  else {
     Serial.println("database connection failed");
   }
-  
+
   dadosSensores.tempTPAint = 0;
   dadosSensores.tempTPAext = 0;
   dadosSensores.tempBAR = 0;
@@ -731,11 +732,11 @@ double getVPP()
 
 void rotacao(){
 
-  uint32_t start_time = millis();
+  int start_time = millis();
 
   startInterrupt = true;
 
-  while((millis()-start_time) < 2000){
+  while((millis()-start_time) < 500){
 
     if(startInterrupt){
       attachInterrupt(3, rpm_fun, CHANGE);
@@ -743,12 +744,12 @@ void rotacao(){
     }
     calculaRotacao();  
   }
-
+  detachInterrupt(3);
 }
 
 void calculaRotacao(){
 
-  if (half_revolutions >= 3) {
+  if (half_revolutions >= 12) {
 
     double a = (millis() - timeold)/1000.0;
     double b = (a/half_revolutions);
@@ -780,5 +781,6 @@ void voltimetroAC() {
   //Serial.println(a);
 }
 //.....................................END FUNCTIONS...............................
+
 
 
